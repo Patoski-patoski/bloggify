@@ -71,6 +71,7 @@ const blogSchema = new Schema({
         type: String,
         unique: true,
         required: true,
+        lowercase: true
     },
     title: {
         type: String,

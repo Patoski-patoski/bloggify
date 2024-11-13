@@ -100,16 +100,16 @@ const blogSchema = new Schema({
         default: 'draft'
     },
     comments: [{
-        author: {type: Schema.Types.ObjectId, ref: 'User', required: true},
-        content: {type: String, required: true},
-        createdAt: {type: Date, default: Date.now},
-        isEdited: {type: Boolean, default: false}
+        author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+        content: { type: String, required: true },
+        createdAt: { type: Date, default: Date.now },
+        isEdited: { type: Boolean, default: false }
     }],
-   meta: {
+    meta: {
         views: { type: Number, default: 0 },
         likes: { type: Number, default: 0 },
     },
-    author: { 
+    author: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true,
@@ -127,13 +127,13 @@ const blogSchema = new Schema({
 });
 
 // Add middleware to update the updatedAt field
-blogSchema.pre('save', function(next) {
+blogSchema.pre('save', function (next) {
     this.updatedAt = new Date();
     next();
 });
 
 // Add middleware to set or update slug from the title
-blogSchema.pre('save', function(next) {
+blogSchema.pre('save', function (next) {
     if (this.isModified('title')) {
         this.slug = slugify(this.title);
     }
@@ -141,13 +141,12 @@ blogSchema.pre('save', function(next) {
 });
 
 
-//  the sensitive _id, author, and __v fields will be excluded automatically.
+// The sensitive _id, author, and __v fields will be excluded automatically.
 blogSchema.set('toJSON', {
     transform: (_doc, ret) => {
-        // ret.id = ret._id; // optionally add `id` field from `_id`
         delete ret._id;
-        delete ret.author; // exclude the author field
-        delete ret.__v; // exclude the version key if not needed
+        delete ret.author;
+        delete ret.__v;
     }
 });
 

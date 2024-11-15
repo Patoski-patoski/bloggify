@@ -3,6 +3,7 @@ export const SALT_ROUNDS = 12;
 export const HTTP_STATUS = {
     OK: 200,
     CREATED: 201,
+    EMPTY: 204,
     BAD_REQUEST: 400,
     UNAUTHORIZED: 401,
     FORBIDDEN: 403,

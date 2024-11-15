@@ -63,7 +63,7 @@ export const updateBlog = asyncHandler(async (req, res) => {
 export const getPostsBySlug = asyncHandler(async (req, res) => {
     const { slug } = req.params;
 
-    const blog = await Blog.find({ slug });
+    const blog = await Blog.findOne({ slug, status: 'published' });
     if (!blog) return res.status(HTTP_STATUS.NOT_FOUND).json(
         {message: "Blog not found"}
     )
@@ -98,10 +98,11 @@ export const getPostsByAuthor = asyncHandler(async (req, res) => {
         .sort({ createdAt: -1 })
         .select('-__v -comments');
 
-    res.status(HTTP_STATUS.OK).json({
-        message: `List of published posts by ${username}`,
-        blogs: authorBlogs
+    return res.status(HTTP_STATUS.OK).json({
+       message: `List of published posts by ${username}`,
+       blogs: authorBlogs
     });
+  
 });
 
 // delete a blog

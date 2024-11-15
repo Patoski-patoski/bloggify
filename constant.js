@@ -1,5 +1,5 @@
 // constants.js
-export const SALT_ROUNDS = 10;
+export const SALT_ROUNDS = 12;
 export const HTTP_STATUS = {
     OK: 200,
     CREATED: 201,

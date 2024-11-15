@@ -4,6 +4,8 @@ import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
+import { HTTP_STATUS, SALT_ROUNDS } from '../../constant.js';
+
 import User from '../models/User.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -20,23 +22,21 @@ export const register = asyncHandler(async (req, res) => {
     });
 
     if (existingUser) {
-        return res.status(400).json({
+        return res.status(HTTP_STATUS.CONFLICT).json({
             message: "User with this email or username already exists"
         });
     }
-    const hashedPAssword = await bcrypt.hash(password, 12);
+    const hashedPAssword = await bcrypt.hash(password, SALT_ROUNDS);
     const newUser = User.create({
         username,
         email,
         password: hashedPAssword
     });
 
-    await newUser.save();
-
     // Not sending password back in response
     newUser.password = undefined;
 
-    res.status(201).json({
+    res.status(HTTP_STATUS.CREATED).json({
         message: "User created successfully:",
         user: newUser
     });
@@ -47,7 +47,7 @@ export const login = asyncHandler(async (req, res) => {
 
     const user = await User.findOne({ email }).select('+password');
     if (!user || !(await bcrypt.compare(password, user.password))) {
-        return res.status(401).json({
+        return res.status(HTTP_STATUS.UNAUTHORIZED).json({
             message: "Invalid credentials"
         });
     }
@@ -72,7 +72,7 @@ export const login = asyncHandler(async (req, res) => {
         sameSite: 'strict'
     });
 
-    res.status(200).json({
+    res.status(HTTP_STATUS.OK).json({
         message: "Login successful",
         user: {
             id: user.id,

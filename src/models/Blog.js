@@ -85,6 +85,9 @@ blogSchema.set('toJSON', {
         delete ret._id;
         delete ret.author;
         delete ret.__v;
+        delete ret.comments;
+        delete ret.updatedAt;
+        delete ret.meta;
     }
 });
 

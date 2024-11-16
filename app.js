@@ -4,10 +4,12 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { config } from 'dotenv';
+import dotenv from 'dotenv';
+import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 
+import config from './config.js';
 import authRouter from './src/routes/authRoutes.js';
 import blogRouter from './src/routes/blogRoutes.js';
 import { connectMongoDB } from './src/database/database.js';
@@ -16,28 +18,24 @@ import { connectMongoDB } from './src/database/database.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-config();
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Security middleware
-app.use(helmet());
-app.use(express.json({ limit: '10kb' }));
+app.use(helmet(config.security.helmet));
+app.use(cors(config.security.cors));
+app.use(express.json({ limit: '5Mb' }));
 app.use(cookieParser());
+app.use(rateLimit(config.security.rateLimit));
 
-// Rate limiting
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100 // Limits each IP to 100 requests per windowMs
-});
-app.use('/', limiter);
 
 // Serve static files from the public directory
-app.use(express.static('public'));
+app.use(express.static('./src/public'));
 
 // Set view engine to EJS
-app.set('views', join(__dirname, 'views'));
+app.set('views', join(__dirname, 'src', 'views'));
 app.set('view engine', 'ejs');
 
 

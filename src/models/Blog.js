@@ -79,7 +79,7 @@ blogSchema.pre('save', function (next) {
 });
 
 
-// The sensitive _id, author, and __v fields will be excluded automatically.
+// The sensitive _id, author, __v, e.t.c fields will be excluded automatically.
 blogSchema.set('toJSON', {
     transform: (_doc, ret) => {
         delete ret._id;

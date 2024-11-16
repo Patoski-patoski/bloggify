@@ -35,6 +35,12 @@ const userSchema = new Schema({
         enum: ['reader', 'author'],
         default: 'author'
     },
+    bio: {
+        type: String,
+        required: true,
+        minlength: 3,
+        maxlenggth: 150
+    },
     createdAt: {
         type: Date,
         default: Date.now,
@@ -46,6 +52,16 @@ const userSchema = new Schema({
     isActive: {
         type: Boolean,
         default: true,
+    }
+});
+
+// The sensitive id, password and createdAt fields will be excluded
+// automatically.
+userSchema.set('toJSON', {
+    transform: (_doc, ret) => {
+        delete ret.password;
+        delete ret.id;
+        delete ret.createdAt;
     }
 });
 

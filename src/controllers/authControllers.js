@@ -15,7 +15,7 @@ if (!JWT_SECRET) {
 }
 
 export const register = asyncHandler(async (req, res) => {
-    const { username, password, email } = req.body;
+    const { username, password, email, bio } = req.body;
 
     const existingUser = await User.findOne({
         $or: [{ email }, { username }]
@@ -30,6 +30,7 @@ export const register = asyncHandler(async (req, res) => {
     const newUser = User.create({
         username,
         email,
+        bio,
         password: hashedPAssword
     });
 

@@ -26,7 +26,7 @@ const PORT = process.env.PORT || 3000;
 // Security middleware
 app.use(helmet(config.security.helmet));
 app.use(cors(config.security.cors));
-app.use(express.json({ limit: '5Mb' }));
+app.use(express.json({ limit: '2MB' }));
 app.use(cookieParser());
 app.use(rateLimit(config.security.rateLimit));
 

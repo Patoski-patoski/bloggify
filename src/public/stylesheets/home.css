@@ -1,0 +1,38 @@
+     .hero-section {
+            background-color: #0d1117;
+            padding: 100px 0;
+            color: #ffffff;
+        }
+        
+        .feature-card {
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .category-badge {
+            background-color: #0d1117;
+            color: #ffffff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .stats-section {
+            background-color: #0d1117;
+            color: #9198a1;
+            padding: 60px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .cta-section {
+            background-color: #FEF9F2;
+            padding: 80px 0;
+        }

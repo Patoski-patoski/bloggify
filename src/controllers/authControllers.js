@@ -5,7 +5,6 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 import { HTTP_STATUS, SALT_ROUNDS } from '../../constant.js';
-
 import User from '../models/User.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -26,16 +25,13 @@ export const register = asyncHandler(async (req, res) => {
             message: "User with this email or username already exists"
         });
     }
-    const hashedPAssword = await bcrypt.hash(password, SALT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     const newUser = User.create({
         username,
         email,
         bio,
-        password: hashedPAssword
+        password: hashedPassword
     });
-
-    // Not sending password back in response
-    newUser.password = undefined;
 
     res.status(HTTP_STATUS.CREATED).json({
         message: "User created successfully:",
@@ -45,6 +41,7 @@ export const register = asyncHandler(async (req, res) => {
 
 export const login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
+    console.log(email, password);
 
     const user = await User.findOne({ email }).select('+password');
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -67,7 +64,7 @@ export const login = asyncHandler(async (req, res) => {
 
     // Set secure cookie
     res.cookie('token', token, {
-        maxAge: 1000 * 60 * 60,
+        maxAge: 1000 * 60 * 60, // 1 hour
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict'

@@ -16,6 +16,12 @@ import {
 
 const blogRouter = Router();
 
+// home page
+
+blogRouter.get(['/', 'home', 'index'], (_req, res, next) => res.render('index'))
+//Create a blog 
+blogRouter.get('/create', authenticateToken, authorizeRole('author'), (_req, res, next) => res.render('create_blog'));
+
 // Post a blog
 blogRouter.post('/blogs', authenticateToken, authorizeRole('author'), postBlog);
 

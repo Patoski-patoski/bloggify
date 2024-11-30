@@ -64,6 +64,7 @@ export default {
                         "https://cdnjs.cloudflare.com",
                         "'unsafe-inline'",
                         "https://code.jquery.com",
+                        "https://cdn.tiny.cloud/",
                         "https://stackpath.bootstrapcdn.com/"
                     ],
                     fontSrc: [
@@ -85,3 +86,4 @@ export default {
     },
     environment: process.env.NODE_ENV || 'production',
 }
+

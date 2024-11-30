@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import morgan from "morgan";
 
 import config from './config.js';
 import authRouter from './src/routes/authRoutes.js';
@@ -24,12 +25,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Security middleware
-app.use(helmet(config.security.helmet));
-app.use(cors(config.security.cors));
+// app.use(helmet(config.security.helmet));
+// app.use(cors(config.security.cors));
 app.use(express.json({ limit: '2MB' }));
 app.use(cookieParser());
 app.use(rateLimit(config.security.rateLimit));
-
+app.use(morgan('dev')); // Logs HTTP requests
 
 // Serve static files from the public directory
 app.use(express.static('./src/public'));
@@ -48,3 +49,5 @@ connectMongoDB();
 app.listen(PORT, () => {
     console.log(`Listening live at port ${PORT}`);
 });
+
+export default app

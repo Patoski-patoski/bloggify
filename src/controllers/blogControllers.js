@@ -115,3 +115,78 @@ export const deleteBlog = asyncHandler(async (req, res) => {
 
     res.status(HTTP_STATUS.OK).json({ message: 'Blog deleted' });
 });
+
+export const getBlogs = async (req, res) => {
+    try {
+        // Get featured posts (you can determine featured posts based on views, likes, etc.)
+        const featuredPosts = await Blog.find({ status: 'published' })
+            .sort({ 'meta.views': -1 })
+            .limit(5)
+            .populate('author', 'username');
+
+        // Get regular posts with pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 9;
+
+        const posts = await Blog.find({ status: 'published' })
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .populate('author', 'username');
+
+        const total = await Blog.countDocuments({ status: 'published' });
+
+        res.render('blogs', {
+            featuredPosts, // Ensure this is passed to the template
+            posts,
+            hasMore: total > page * limit,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: 'Error fetching blogs',
+            error: error.message,
+        });
+    }
+};
+
+export const searchBlogs = async (req, res) => {
+    try {
+        const { q, sort, page = 1, limit = 9 } = req.query;
+
+        let query = { status: 'published' };
+        if (q) {
+            query.$text = { $search: q };
+        }
+
+        let sortQuery = {};
+        switch (sort) {
+            case 'oldest':
+                sortQuery = { createdAt: 1 };
+                break;
+            case 'popular':
+                sortQuery = { 'meta.views': -1 };
+                break;
+            default:
+                sortQuery = { createdAt: -1 };
+        }
+
+        const posts = await Blog.find(query)
+            .sort(sortQuery)
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .populate('author', 'username');
+
+        const total = await Blog.countDocuments(query);
+
+        res.json({
+            posts,
+            hasMore: total > page * limit
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error searching blogs',
+            error: error.message
+        });
+    }
+};

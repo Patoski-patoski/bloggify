@@ -7,6 +7,8 @@ import {
     postBlog,
     deleteBlog,
     getAllPublishedBlogs,
+    searchBlogs,
+    getBlogs,
     getPostsByAuthor,
     getPostsBySlug,
     updateBlog
@@ -24,12 +26,15 @@ blogRouter.put('/blogs/:slug', authenticateToken, authorizeRole('author'), updat
 blogRouter.delete('/blogs/:slug', authenticateToken, authorizeRole('author'), deleteBlog);
 
 // Get all published blogs
-blogRouter.get('/blogs', getAllPublishedBlogs);
+// blogRouter.get('/blogs', getAllPublishedBlogs);
 
 // Get published blogs by author name
 blogRouter.get('/blogs/author/:username', getPostsByAuthor);
 
 // Get published blogs by slug
 blogRouter.get('/blogs/:slug', getPostsBySlug);
+
+blogRouter.get('/blogs', getBlogs);
+blogRouter.get('/api/blogs/search', searchBlogs);
 
 export default blogRouter;

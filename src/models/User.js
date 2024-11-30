@@ -39,7 +39,7 @@ const userSchema = new Schema({
         type: String,
         required: true,
         minlength: 3,
-        maxlenggth: 150
+        maxlength: 150
     },
     createdAt: {
         type: Date,

@@ -17,7 +17,6 @@ const blogSchema = new Schema({
         trim: true,
         maxLength: [200, 'Title cannot be longer han 200 characters']
     },
-
     subtitle: {
         type: String,
         trim: true,

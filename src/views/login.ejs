@@ -81,6 +81,9 @@
                         <input type="checkbox" class="form-check-input" id="rememberMe">
                         <label class="form-check-label" for="rememberMe">Remember me</label>
                     </div>
+                    <div class="mb-3">
+                        <p id="error-message"></p>
+                    </div>
                     <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
                 <div class="text-center mt-3">
@@ -92,46 +95,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            // Clear previous error messages
-            document.querySelectorAll('.error-message').forEach(elem => elem.textContent = '');
-            
-            const formData = {
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value
-            };
-
-            try {
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        // Handle invalid credentials
-                        const errorElem = document.querySelector('#email').nextElementSibling;
-                        errorElem.textContent = data.message;
-                    } else {
-                        throw new Error(data.message || 'Login failed');
-                    }
-                } else {
-                    // Successful login
-                    window.location.href = '/dashboard';
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert(error.message || 'An error occurred during login');
-            }
-        });
-    </script>
+    <script src="/javascript/auth.js"></script>
 </body>
 </html>

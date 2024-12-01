@@ -5,8 +5,8 @@ async function signupBlog() {
 
     const formData = {
         username: document.getElementById('username').value,
-        email: document.getElementById('email').value,
-        password: document.getElementById('password').value,
+        email: document.getElementById('signup-email').value,
+        password: document.getElementById('signup-password').value,
         bio: document.getElementById('bio').value
     };
 
@@ -41,11 +41,11 @@ async function signupBlog() {
     }
 }
 
-document.getElementById('signupForm').addEventListener('submit', (event) => {
+document.getElementById('signupForm')?.addEventListener('submit', (event) => {
+    alert('Yeahh');
     event.preventDefault();
-    signupBlog(event);
+    signupBlog();
 });
-
 
 // Login User function
 async function loginBlog() {
@@ -53,10 +53,10 @@ async function loginBlog() {
     document.querySelectorAll('.error-message').forEach(
         elem => elem.textContent = '');
 
-    const formData = {
-        email: document.getElementById('email').value,
-        password: document.getElementById('password').value
-    };
+   const formData = { 
+     email: document.getElementById('login-email').value,
+     password: document.getElementById('login-password').value,
+   }
 
     try {
         const response = await fetch('/login', {
@@ -71,8 +71,8 @@ async function loginBlog() {
         if (!response.ok) {
             if (response.status === 401) {
                 // Handle invalid credentials
-                const emailErrorElem = document.querySelector('#email').nextElementSibling;
-                const passwordErrorElem = document.querySelector('#password').nextElementSibling;
+                const emailErrorElem = document.querySelector('#login-email').nextElementSibling;
+                const passwordErrorElem = document.querySelector('#login-password').nextElementSibling;
                 if (emailErrorElem) {
                     emailErrorElem.textContent = data.message;
                 }
@@ -95,7 +95,7 @@ async function loginBlog() {
     }
 }
 
-document.getElementById('loginForm').addEventListener('submit', (event) => {
+document.getElementById('loginForm')?.addEventListener('submit', (event) => {
     event.preventDefault();
-    loginBlog(event);
+    loginBlog();
 });

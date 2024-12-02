@@ -33,12 +33,11 @@ async function publishBlog(formData) {
         });
 
         const data = await response.json();
-
         if (response.ok) {
             showAlert('Blog published successfully!');
             setTimeout(() => {
                 window.location.href = `/blogs/${data.blog.slug}`;
-            }, 1000);
+            }, 2000);
         } else {
             throw new Error(data.message || 'Failed to publish blog');
         }
@@ -50,25 +49,24 @@ async function publishBlog(formData) {
 // Save as draft function
 async function saveDraft(formData) {
     try {
-        const response = await fetch('/create', {
+        const response = await fetch('/blogs', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(formData)
         });
 
         const data = await response.json();
         if (response.ok) {
-            showAlert('Draft saved successfully!');
+            showAlert('Draft saved successfully!', 'warning');
         } else {
             throw new Error(data.message || 'Failed to save draft');
         }
     } catch (error) {
+        console.error("Error Here", error);
+        console.dir(error);
         showAlert(error.message, 'danger');
     }
 }
-
 
 // Show alert function
 function showAlert(message, type = 'success') {
@@ -79,7 +77,7 @@ function showAlert(message, type = 'success') {
                 ${message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             `;
-    alertContainer.appendChild(alert);
+    alertContainer.append(alert);
 
     // Auto-dismiss after 5 seconds
     setTimeout(() => {
@@ -87,42 +85,56 @@ function showAlert(message, type = 'success') {
     }, 5000);
 }
 
-
-document.getElementById('save-draft').addEventListener('click', (event) => {
+document.getElementById('save-draft')?.addEventListener('click', async (event) => {
     event.preventDefault();
-    saveDraft();
+
+    const draftButton = document.getElementById('save-draft-btn');
+    draftButton.ariaDisabled = true;
+    draftButton.disabled = true;
+    
+    const formData = {
+        title: document.getElementById('title').value,
+        subtitle: document.getElementById('subtitle').value,
+        content: tinymce.get('content').getContent(),
+        status: 'draft'
+    };
+    await saveDraft(formData);
+
+    setTimeout(() => {
+        draftButton.ariaDisabled = false;
+        draftButton.disabled = false;
+    }, 3000);
 });
 
+document.getElementById('publish-blog-btn')?.addEventListener('click', async (event) => {
+    event.preventDefault();
+
+    const publishButton = document.getElementById('publish-blog-btn');
+    publishButton.ariaDisabled = true;
+    publishButton.disabled = true;
+
+    const formData = {
+        title: document.getElementById('title').value,
+        subtitle: document.getElementById('subtitle').value,
+        content: tinymce.get('content').getContent(),
+        status: 'published'
+    };
+    await publishBlog(formData);
+
+    setTimeout(() => { 
+        publishButton.ariaDisabled = false;
+        publishButton.disabled = false;
+        }, 3000);
+    });
+
+
 // Character count for title and subtitle
-document.getElementById('title').addEventListener('input', function () {
+document.getElementById('title')?.addEventListener('input', function () {
     document.getElementById('titleCount').textContent =
         `${this.value.length}/200 characters`;
 });
 
-document.getElementById('subtitle').addEventListener('input', function () {
+document.getElementById('subtitle')?.addEventListener('input', function () {
     document.getElementById('subtitleCount').textContent =
         `${this.value.length}/500 characters`;
-});
-
-document.getElementById('publish-blog').addEventListener('click', (event) => {
-    event.preventDefault();
-    publishBlog(event);  // Passed the event to prevent the default form submission
-});
-
-document.getElementById('blog-form').addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const formData = {
-        title: document.getElementById('title').value,
-        subtitle: document.getElementById('subtitle').value,
-        content: tinymce.get('content').getContent()
-    }
-
-    const buttonClicked = event.submitter; // Identifies the button that triggered the submit
-    if (buttonClicked.id === 'save-draft') {
-        FormData.status = 'draft';
-        await saveDraft(formData);
-    } else if (buttonClicked.id === 'publish-blog') {
-        formData.status = 'published';
-        await publishBlog(formData);
-    }
 });

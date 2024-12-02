@@ -21,7 +21,7 @@ async function signupBlog() {
 
         const data = await response.json();
         if (!response.ok) {
-            if (response.status === HTTP_STATUS.CONFLICT) {
+            if (response.status === 409) {
                 // Handle existing user error
                 const errorElem = document.querySelector('#email').nextElementSibling;
                 errorElem.textContent = data.message;

@@ -9,11 +9,11 @@ import asyncHandler from 'express-async-handler';
 
 // POST a blog
 export const postBlog = asyncHandler(async (req, res) => {
-    const { title, subtitle, content } = req.body;
+    const { title, subtitle, content, status } = req.body;
 
     const user = await User.findOne({ id: req.user.userId });
     if (!user) return res.status(HTTP_STATUS.UNAUTHORIZED).json(
-        { message: "Invalid credentials" });
+        { message: "Authentication failed. Please check your credentials." });
 
     try {
         const slug = await generateUniqueSlug(title);
@@ -21,14 +21,14 @@ export const postBlog = asyncHandler(async (req, res) => {
             title,
             subtitle,
             content,
+            status,
             slug,
-            status: 'published',
             author: user._id
         });
 
-        res.status(HTTP_STATUS.CREATED).json(
+        return res.status(HTTP_STATUS.CREATED).json(
             { message: "Blog post created", blog: newBlog });
-        
+
     } catch (error) {
         console.error(error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(
@@ -37,7 +37,7 @@ export const postBlog = asyncHandler(async (req, res) => {
 });
 
 // PUT a blog
-export const updateBlog = asyncHandler(async (req, res) => { 
+export const updateBlog = asyncHandler(async (req, res) => {
     const { slug } = req.params;
     const updates = req.body;
 
@@ -53,7 +53,8 @@ export const updateBlog = asyncHandler(async (req, res) => {
 
     if (!blog) return res.status(HTTP_STATUS.NOT_FOUND).json(
         { message: "Blog not found or not authorized" });
-    res.status(HTTP_STATUS.OK).json({
+
+    return res.status(HTTP_STATUS.OK).json({
         message: "Blog Updated",
         blog
     });
@@ -62,15 +63,21 @@ export const updateBlog = asyncHandler(async (req, res) => {
 // GET post by slug
 export const getPostsBySlug = asyncHandler(async (req, res) => {
     const { slug } = req.params;
-
     const blog = await Blog.findOne({ slug, status: 'published' });
     if (!blog) return res.status(HTTP_STATUS.NOT_FOUND).json(
-        {message: "Blog not found"}
+        { message: "Blog not found" }
     )
-    res.status(HTTP_STATUS.OK).json({
+    const acceptHeader = req.get('Accept');
+    console.log(acceptHeader);
+    
+    // if (acceptHeader && acceptHeader.includes('text/html')) {
+    //     return res.render('blog', { blog });
+    // }
+
+    return res.status(HTTP_STATUS.OK).json({
         message: "Published posts",
         blog
-    })
+    });
 });
 
 // Search and GET all published post
@@ -79,7 +86,7 @@ export const getAllPublishedBlogs = asyncHandler(async (_req, res) => {
         .sort({ createdAt: -1 })
         .select('-__v -comments -author');
 
-    res.status(HTTP_STATUS.OK).json({
+    return res.status(HTTP_STATUS.OK).json({
         message: "List of published posts",
         blogs: publishedBlogs
     });
@@ -99,10 +106,9 @@ export const getPostsByAuthor = asyncHandler(async (req, res) => {
         .select('-__v -comments');
 
     return res.status(HTTP_STATUS.OK).json({
-       message: `List of published posts by ${username}`,
-       blogs: authorBlogs
+        message: `List of published posts by ${username}`,
+        blogs: authorBlogs
     });
-  
 });
 
 // delete a blog
@@ -113,7 +119,7 @@ export const deleteBlog = asyncHandler(async (req, res) => {
     if (!blog) return res.status(HTTP_STATUS.NOT_FOUND).json(
         { message: "Blog not found or not authorized" });
 
-    res.status(HTTP_STATUS.OK).json({ message: 'Blog deleted' });
+    return res.status(HTTP_STATUS.OK).json({ message: 'Blog deleted' });
 });
 
 export const getBlogs = async (req, res) => {
@@ -179,7 +185,7 @@ export const searchBlogs = async (req, res) => {
 
         const total = await Blog.countDocuments(query);
 
-        res.json({
+        return res.json({
             posts,
             hasMore: total > page * limit
         });

@@ -28,6 +28,7 @@ const PORT = process.env.PORT || 3000;
 // app.use(helmet(config.security.helmet));
 // app.use(cors(config.security.cors));
 app.use(express.json({ limit: '2MB' }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(rateLimit(config.security.rateLimit));
 app.use(morgan('dev')); // Logs HTTP requests
@@ -41,8 +42,8 @@ app.set('view engine', 'ejs');
 
 
 // Routes
-app.use( authRouter);
-app.use( blogRouter);
+app.use( authRouter );
+app.use( blogRouter );
 
 connectMongoDB();
 

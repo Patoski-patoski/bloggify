@@ -3,7 +3,8 @@ import Blog from '../models/Blog.js';
 
 const generateUniqueSlug = async (title) => {
     try {
-        let slug = slugify(title, { lower: true });
+        let slug = slugify(title, { lower: true, trim: true });
+        console.log('slug', slug);
         let exists = await Blog.findOne({ slug });
         let count = 1;
 

@@ -32,7 +32,7 @@
             <div class="card-body p-4">
                 <h1 class="mb-4">Create New Article</h1>
                 
-                <form id="blogForm" method="POST" action="/blogs">
+                <form id="blogForm" method="POST">
                     <div class="mb-4">
                         <label for="title" class="form-label required-field">Title</label>
                         <input 
@@ -74,14 +74,16 @@
                         <button 
                             type="button" 
                             class="btn btn-save"
-                            id="save-draft"
+                            id="save-draft-btn"
                         >
                             <i class="fas fa-save me-2"></i>Save as Draft
                         </button>
                         <button 
                             type="submit",
                             class="btn btn-primary"
-                            id="publish-blog"
+                            id="publish-blog-btn",
+                            aria-busy="false".
+                            aria-disabled="true"
                         >
                             <i class="fas fa-paper-plane me-2"></i>Publish
                         </button>

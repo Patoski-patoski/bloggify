@@ -31,7 +31,7 @@ import {
 const blogRouter = Router();
 
 // Render homepage
-blogRouter.get('/home', (_req, res, next) => res.render('index'))
+blogRouter.get(['/home', '/'], (_req, res, next) => res.render('index'))
 // GET all blogs
 blogRouter.get('/blogs', getBlogs);
 // POST a blog

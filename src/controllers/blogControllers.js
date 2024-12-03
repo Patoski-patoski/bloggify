@@ -63,20 +63,23 @@ export const updateBlog = asyncHandler(async (req, res) => {
 // GET post by slug
 export const getPostsBySlug = asyncHandler(async (req, res) => {
     const { slug } = req.params;
+
     const blog = await Blog.findOne({ slug, status: 'published' });
     if (!blog) return res.status(HTTP_STATUS.NOT_FOUND).json(
         { message: "Blog not found" }
     )
-    const acceptHeader = req.get('Accept');
-    console.log(acceptHeader);
-    
-    // if (acceptHeader && acceptHeader.includes('text/html')) {
-    //     return res.render('blog', { blog });
-    // }
 
+    const author = await User.findOne({ _id: blog.author });
+    const acceptHeader = req.get('Accept');
+    const username = author.username;
+
+    if (acceptHeader && acceptHeader.includes('text/html')) {
+        return res.render('new_blog', { blog, username });
+    }
     return res.status(HTTP_STATUS.OK).json({
         message: "Published posts",
-        blog
+        blog,
+        username
     });
 });
 

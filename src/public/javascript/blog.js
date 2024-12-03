@@ -63,7 +63,6 @@ async function saveDraft(formData) {
         }
     } catch (error) {
         console.error("Error Here", error);
-        console.dir(error);
         showAlert(error.message, 'danger');
     }
 }
@@ -129,6 +128,7 @@ document.getElementById('publish-blog-btn')?.addEventListener('click', async (ev
 
 
 // Character count for title and subtitle
+
 document.getElementById('title')?.addEventListener('input', function () {
     document.getElementById('titleCount').textContent =
         `${this.value.length}/200 characters`;

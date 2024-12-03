@@ -1,0 +1,14 @@
+   .blog-header {
+            background-color: #f8f9fa;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        .blog-content {
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        .blog-meta {
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }

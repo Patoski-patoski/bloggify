@@ -22,6 +22,10 @@ const blogSchema = new Schema({
         trim: true,
         maxLength: [500, 'Subtitle cannot be longer than 500 characters']
     },
+    image: {
+        type: String,
+        trim: true
+    },
     content: {
         type: String,
         required: [true, 'Content is required'],
@@ -75,7 +79,7 @@ blogSchema.pre('save', function (next) {
         this.slug = slugify(this.title);
     }
     next();
-});
+});``
 
 
 // The sensitive _id, author, __v, e.t.c fields will be excluded automatically.

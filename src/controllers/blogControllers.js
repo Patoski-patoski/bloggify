@@ -5,10 +5,24 @@ import User from '../models/User.js';
 import { HTTP_STATUS } from '../../constant.js';
 import generateUniqueSlug from '../utils/slugify.js';
 import asyncHandler from 'express-async-handler';
+import multer from 'multer';
 
+// configure multer storage
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+
+// File upload middleware 
+const upload = multer({ storage: storage });
 
 // POST a blog
-export const postBlog = asyncHandler(async (req, res) => {
+export const postBlog = asyncHandler(upload.single('file'), async (req, res) => {
     const { title, subtitle, content, status } = req.body;
 
     const user = await User.findOne({ id: req.user.userId });
@@ -16,6 +30,7 @@ export const postBlog = asyncHandler(async (req, res) => {
         { message: "Authentication failed. Please check your credentials." });
 
     try {
+        const image = req.file ? `/uploads/${req.file.filename}` : req.body.imageURL
         const slug = await generateUniqueSlug(title);
         const newBlog = await Blog.create({
             title,
@@ -23,6 +38,7 @@ export const postBlog = asyncHandler(async (req, res) => {
             content,
             status,
             slug,
+            image,
             author: user._id
         });
 
@@ -143,11 +159,16 @@ export const getBlogs = async (req, res) => {
             .limit(limit)
             .populate('author', 'username');
 
+        console.log('posts', posts);
+
         const total = await Blog.countDocuments({ status: 'published' });
 
         res.render('blogs', {
-            featuredPosts, // Ensure this is passed to the template
+            featuredPosts,
             posts,
+            page,
+            limit,
+            total,
             hasMore: total > page * limit,
         });
     } catch (error) {

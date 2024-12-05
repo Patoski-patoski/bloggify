@@ -25,6 +25,8 @@
                 <div>Author: <%= username.toUpperCase() %></div>
             </div>
         </div>
+        <img src="<%= blog.image || '' %>" class=" d-block w-100 img-fluid" alt="Blog image">
+        <!-- <img src="<%= post.image || '/img/user.jpg' %>" alt="Blog Image" class="img-fluid"> -->
 
         <article class="blog-content">
             <%- blog.content %>

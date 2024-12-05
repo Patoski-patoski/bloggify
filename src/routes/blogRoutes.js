@@ -43,7 +43,7 @@ blogRouter.put('/blogs/:slug', authenticateToken, authorizeRole('author'), updat
 // DELETE a blog by slug
 blogRouter.delete('body/:slug', authenticateToken, authorizeRole('author'), deleteBlog);
 
-// blogRouter.get('/create', authenticateToken, authorizeRole('author'), (_req, res, next) => res.render('create_blog'));
+blogRouter.get('/create', authenticateToken, authorizeRole('author'), (_req, res, next) => res.render('create_blog'));
 
 // Update a POST
 blogRouter.put('/:slug', authenticateToken, authorizeRole('author'), updateBlog);

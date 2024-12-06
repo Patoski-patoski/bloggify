@@ -22,16 +22,14 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // POST a blog
-export const postBlog = asyncHandler(upload.single('file'), async (req, res) => {
-    const { title, subtitle, content, status } = req.body;
+export const postBlog = asyncHandler(async (req, res) => {
+    const { title, subtitle, content, status, image } = req.body;
 
     const user = await User.findOne({ id: req.user.userId });
     if (!user) return res.status(HTTP_STATUS.UNAUTHORIZED).json(
         { message: "Authentication failed. Please check your credentials." });
 
     try {
-        const image = req.file ? `/uploads/${req.file.filename}` : req.body.imageURL;
-        console.log(image);
         const slug = await generateUniqueSlug(title);
         const newBlog = await Blog.create({
             title,
@@ -159,8 +157,6 @@ export const getBlogs = async (req, res) => {
             .skip((page - 1) * limit)
             .limit(limit)
             .populate('author', 'username');
-
-        // console.log('posts', posts);
 
         const total = await Blog.countDocuments({ status: 'published' });
 

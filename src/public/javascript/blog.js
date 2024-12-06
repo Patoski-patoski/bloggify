@@ -41,6 +41,7 @@ async function publishBlog(formData) {
             throw new Error(data.message || 'Failed to publish blog');
         }
     } catch (error) {
+        console.error(error);
         showAlert(error.message, 'danger');
     }
 }
@@ -71,10 +72,7 @@ function showAlert(message, type = 'success') {
     const alertContainer = document.getElementById('alert-container');
     const alert = document.createElement('div');
     alert.className = `alert alert-${type} alert-dismissible fade show`;
-    alert.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            `;
+    alert.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`;
     alertContainer.append(alert);
 
     // Auto-dismiss after 5 seconds
@@ -105,8 +103,8 @@ document.getElementById('save-draft')?.addEventListener('click', async (event) =
 });
 
 document.getElementById('publish-blog-btn')?.addEventListener('click', async (event) => {
-    event.preventDefault();
-
+    event.preventDefault(event);
+    alert("Just clicked");
     const publishButton = document.getElementById('publish-blog-btn');
     publishButton.ariaDisabled = true;
     publishButton.disabled = true;
@@ -115,7 +113,7 @@ document.getElementById('publish-blog-btn')?.addEventListener('click', async (ev
         title: document.getElementById('title').value,
         subtitle: document.getElementById('subtitle').value,
         content: tinymce.get('content').getContent(),
-        // image: document.getElementById('imagePreview').innerHTML,
+        image: document.getElementById("imagePreview").src,
         status: 'published'
     };
     await publishBlog(formData);
@@ -128,7 +126,6 @@ document.getElementById('publish-blog-btn')?.addEventListener('click', async (ev
 
 
 // Character count for title and subtitle
-
 document.getElementById('title')?.addEventListener('input', function () {
     document.getElementById('titleCount').textContent =
         `${this.value.length}/200 characters`;
@@ -144,10 +141,10 @@ document.getElementById('subtitle')?.addEventListener('input', function () {
 function previewImage(event) {
     const imagePreview = document.getElementById("imagePreview");
     const file = event.target.files[0];
-    console.log(file);
+    console.log('file', file);
     if (file) {
         const reader = new FileReader();
-        console.log(reader);
+        console.log('reader', reader);
         reader.onload = function () {
             imagePreview.src = reader.result;
             imagePreview.style.display = "block";
@@ -161,11 +158,9 @@ document.getElementById('image-input')?.addEventListener('change', (event) => {
     previewImage(event);
 });
 
-document
-    .getElementById("unsplashSearch")
-    .addEventListener("input", async function () {
+document.getElementById("unsplashSearch").addEventListener(
+    "input", async function () {
         const query = this.value;
-        
         const gallery = document.getElementById("unsplashGallery");
         gallery.innerHTML = ""; // Clear previous results
 
@@ -178,6 +173,8 @@ document
             data.results.forEach((image) => {
                 const imgElement = document.createElement("img");
                 imgElement.src = image.urls.small;
+                // to get an array of unsplash image, get from imgElement.src and store in an array
+                // console.log("img element", imgElement.src);
                 imgElement.alt = image.description || "Unsplash Image";
                 imgElement.className = "img-thumbnail";
                 imgElement.style.cursor = "pointer";
@@ -192,6 +189,8 @@ document
 function selectUnsplashImage(imageUrl) {
     const imagePreview = document.getElementById("imagePreview");
     imagePreview.src = imageUrl;
+    console.log('imagePreview.src', imagePreview.src);
+    
     imagePreview.style.display = "block";
 
     // Close modal

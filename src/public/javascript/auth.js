@@ -84,7 +84,7 @@ async function loginBlog() {
             }
         } else {
             // Successful login
-            window.location.href = '/blogs';
+            window.location.href = '/create';
         }
     } catch (error) {
         console.error('Error:', error);

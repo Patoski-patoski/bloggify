@@ -1,5 +1,4 @@
 // public/javascript/blog.js
-
 // Initialize TinyMCE
 
 tinymce.init({
@@ -157,17 +156,16 @@ function previewImage(event) {
     }
 }
 
-document.getElementById('image-input').addEventListener('change', (event) => {
+document.getElementById('image-input')?.addEventListener('change', (event) => {
     // event.preventDefault();
     previewImage(event);
 });
-// const UNSPLASH_ACCESS_KEY = "8VG9onz4YdQhLDEspVOJlkvs9d9aefL8t-hRFI_YM6E";
-const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 
 document
     .getElementById("unsplashSearch")
     .addEventListener("input", async function () {
         const query = this.value;
+        
         const gallery = document.getElementById("unsplashGallery");
         gallery.innerHTML = ""; // Clear previous results
 

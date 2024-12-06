@@ -17,7 +17,7 @@
                 <p class="lead text-muted"><%= blog.subtitle %></p>
             <% } %>
             <div class="blog-meta">
-                <span>Published on: <%= new Date(blog.createdAt).toLocaleDateString('en-US', { 
+                <span>Published on: <%= new Date(blog.createdAt).toLocaleDateString('en-GB', { 
                     year: 'numeric',
                     month: 'long', 
                     day: 'numeric'
@@ -25,10 +25,8 @@
                 <div>Author: <%= username.toUpperCase() %></div>
             </div>
         </div>
-        <img src="<%= blog.image || '' %>" class=" d-block w-100 img-fluid" alt="Blog image">
-        <!-- <img src="<%= post.image || '/img/user.jpg' %>" alt="Blog Image" class="img-fluid"> -->
-
-        <article class="blog-content">
+        <img src="<%= blog.image || '/img/carousel-1.jpg' %>" class=" d-block w-100 img-fluid" alt="Blog image">
+        <article class="blog-content mt-5">
             <%- blog.content %>
         </article>
     </div>

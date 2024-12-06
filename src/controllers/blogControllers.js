@@ -30,7 +30,8 @@ export const postBlog = asyncHandler(upload.single('file'), async (req, res) => 
         { message: "Authentication failed. Please check your credentials." });
 
     try {
-        const image = req.file ? `/uploads/${req.file.filename}` : req.body.imageURL
+        const image = req.file ? `/uploads/${req.file.filename}` : req.body.imageURL;
+        console.log(image);
         const slug = await generateUniqueSlug(title);
         const newBlog = await Blog.create({
             title,
@@ -159,7 +160,7 @@ export const getBlogs = async (req, res) => {
             .limit(limit)
             .populate('author', 'username');
 
-        console.log('posts', posts);
+        // console.log('posts', posts);
 
         const total = await Blog.countDocuments({ status: 'published' });
 

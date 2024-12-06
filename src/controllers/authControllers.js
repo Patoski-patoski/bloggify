@@ -8,6 +8,8 @@ import { HTTP_STATUS, SALT_ROUNDS } from '../../constant.js';
 import User from '../models/User.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
+const REFRESH_JWT_SECRET = process.env.REFRESH_JWT_SECRET;
+
 if (!JWT_SECRET) {
     console.error('JWT_SECRET not set in environmental variable');
     process.exit(1);
@@ -39,9 +41,14 @@ export const register = asyncHandler(async (req, res) => {
     });
 });
 
+export const logout = asyncHandler(async (req, res) => {
+    res.clearCookie('token');
+    res.status(HTTP_STATUS.OK).json({
+        message: "Logout successful"
+    });
+})
 export const login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-    console.log(email, password);
 
     const user = await User.findOne({ email }).select('+password');
     if (!user || !(await bcrypt.compare(password, user.password))) {

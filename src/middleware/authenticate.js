@@ -8,11 +8,14 @@ const authenticateToken = (req, res, next) => {
     const token = req.cookies.token;
 
     if (!token) {
-        return res.status(401).json({ message: "Authenticarion required" });
+        return res.status(401).render('unauthorized', {
+            message: 'Authentication required. Please log in to create a blog post.',
+        });
     }
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
         req.user = decoded; // Attach decode user info to req object
+        res.locals.user = decoded; // Make user info available in EJS templates
         next();
     } catch (error) {
         if (error.name === 'TokenExpiredError') {

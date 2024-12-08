@@ -127,8 +127,35 @@ export const logout = asyncHandler(async (req, res) => {
     });
 })
 
+export const authenticateToken = (req, res, next) => {
+    const accessToken = req.cookies.accessToken;
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!accessToken) {
+        if (!refreshToken) {
+            return res.status(HTTP_STATUS.FORBIDDEN).render('unauthorized', {
+                message: "Invalid or expired access token.",
+            });
+        }
+        return refreshTokens(req, res);
+    }
+
+    try {
+        const decoded = jwt.verify(accessToken, JWT_SECRET);
+        req.user = decoded; // Attach decoded user info to req object
+        res.locals.user = decoded; // Make user info available in EJS templates
+        next();
+
+    } catch (error) {
+        return res.status(HTTP_STATUS.FORBIDDEN).render('unauthorized', {
+            message: "Invalid or expired access token.",
+        });
+    }
+};
+
 export const refreshTokens = asyncHandler(async (req, res) => {
     const { refreshToken } = req.cookies;
+    console.log('refreshToken', refreshToken);
 
     if (!refreshToken) {
         return res.status(HTTP_STATUS.UNAUTHORIZED).json({
@@ -137,13 +164,14 @@ export const refreshTokens = asyncHandler(async (req, res) => {
     }
 
     try {
-        // verify refresh token
+        // Verify refresh token
         const decoded = jwt.verify(refreshToken, REFRESH_JWT_SECRET);
+
         // Find user with this refresh token
         const user = await User.findOne({
             refreshToken,
             refreshTokenExpiresAt: { $gt: new Date() }
-        })
+        });
 
         if (!user) {
             return res.status(HTTP_STATUS.UNAUTHORIZED).json({
@@ -151,9 +179,16 @@ export const refreshTokens = asyncHandler(async (req, res) => {
             });
         }
 
-        // GEnerate new access token
+        // Generate new access token and refresh token
         const newAccessToken = generateAccessToken(user);
+        const newRefreshToken = generateRefreshToken(user);
 
+        // Update user's refresh token in the database
+        user.refreshToken = newRefreshToken;
+        user.refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+        await user.save();
+
+        // Set cookies for the new tokens
         res.cookie('accessToken', newAccessToken, {
             maxAge: 1000 * 60 * 60, // 1 hour
             httpOnly: true,
@@ -161,14 +196,23 @@ export const refreshTokens = asyncHandler(async (req, res) => {
             sameSite: 'Strict'
         });
 
+        res.cookie('refreshToken', newRefreshToken, {
+            maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+            httpOnly: true,
+            secure: isProductionEnv,
+            sameSite: 'Strict'
+        });
+
         res.status(HTTP_STATUS.OK).json({
-            message: "Token refresh successfully"
+            message: "Tokens refreshed successfully",
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken // Corrected to return the new refresh token
         });
 
     } catch (error) {
         console.error("RefreshTokens Error", error);
         return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             error: "Invalid Refresh token"
-        })
+        });
     }
 });

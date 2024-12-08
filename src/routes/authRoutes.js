@@ -4,7 +4,6 @@ import { register, login, logout, refreshTokens } from '../controllers/authContr
 
 const authRouter = Router();
 
-
 authRouter.get(['/signup', '/register'], (_req, res, next) => res.render('signup'));
 authRouter.get('/login', (_req, res, next) => res.render('login'));
 authRouter.get('/logout', (_req, res, next) => res.render('login'));
@@ -14,7 +13,7 @@ authRouter.get('/single', (_req, res, next) => res.render('single'));
 
 authRouter.post('/register', register);
 authRouter.post('/login', login);
-authRouter.post('/refresh-token', refreshTokens);
+// authRouter.post('/create', refreshTokens);
 authRouter.post('/logout', logout);
 
 export default authRouter;

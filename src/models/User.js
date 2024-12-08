@@ -52,6 +52,13 @@ const userSchema = new Schema({
     isActive: {
         type: Boolean,
         default: true,
+    },
+    refreshToken: {
+        type: String,
+        select: false  // Prevents returning this field in queries
+    },
+    refreshTokenExpiresAt: {
+        type: Date
     }
 });
 

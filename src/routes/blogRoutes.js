@@ -1,7 +1,7 @@
 // routes/blogRoutes.js
 
 import { Router } from 'express';
-import authenticateToken from '../middleware/authenticate.js';
+import {authenticateToken} from '../middleware/authenticate.js';
 import authorizeRole from '../middleware/authorize.js';
 import {
     postBlog,
@@ -44,17 +44,12 @@ blogRouter.put('/blogs/:slug', authenticateToken, authorizeRole('author'), updat
 blogRouter.delete('body/:slug', authenticateToken, authorizeRole('author'), deleteBlog);
 
 blogRouter.get('/create', authenticateToken, authorizeRole('author'), (req, res, next) => {
-     if (!req.user) {
-      return res.render('unauthorized', {
-          message: 'Authentication required. Please log in to create a post.',
-      });
-     }
+ 
     res.render('create_blog', { unsplashAccessKey: process.env.UNSPLASH_ACCESS_KEY });
 });
 
 // Update a POST
 blogRouter.put('/:slug', authenticateToken, authorizeRole('author'), updateBlog);
-
 
 // Get all published blogs
 // blogRouter.get('/blogs', getAllPublishedBlogs);

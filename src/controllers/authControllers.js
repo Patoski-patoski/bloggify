@@ -9,12 +9,35 @@ import User from '../models/User.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const REFRESH_JWT_SECRET = process.env.REFRESH_JWT_SECRET;
+const isProductionEnv = process.env.NODE_ENV === 'production';
 
 if (!JWT_SECRET) {
     console.error('JWT_SECRET not set in environmental variable');
     process.exit(1);
 }
 
+// Generate Access token
+const generateAccessToken = (user) => {
+    return jwt.sign(
+        {
+            userId: user.id,
+            role: user.role,
+            email: user.email
+        },
+        JWT_SECRET,
+        { expiresIn: '1h' }
+    );
+};
+
+const generateRefreshToken = (user) => {
+    return jwt.sign(
+        {
+            userId: user.id
+        },
+        REFRESH_JWT_SECRET,
+        { expiresIn: '7d' }
+    )
+}
 export const register = asyncHandler(async (req, res) => {
     const { username, password, email, bio } = req.body;
 
@@ -41,12 +64,6 @@ export const register = asyncHandler(async (req, res) => {
     });
 });
 
-export const logout = asyncHandler(async (req, res) => {
-    res.clearCookie('token');
-    res.status(HTTP_STATUS.OK).json({
-        message: "Logout successful"
-    });
-})
 export const login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
@@ -58,22 +75,27 @@ export const login = asyncHandler(async (req, res) => {
     }
 
     user.lastLogin = new Date();
+    // Generate tokens
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    // Store refresh taken in database 
+    user.refreshToken = refreshToken;
+    user.refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     await user.save();
 
-    const token = jwt.sign(
-        {
-            userId: user.id,
-            role: user.role,
-            email: user.email
-        },
-        JWT_SECRET,
-        { expiresIn: '1h' });
-
     // Set secure cookie
-    res.cookie('token', token, {
+    res.cookie('accessToken', accessToken, {
         maxAge: 1000 * 60 * 60, // 1 hour
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: isProductionEnv,
+        sameSite: 'strict'
+    });
+
+    res.cookie('refreshToken', refreshToken, {
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+        httpOnly: true,
+        secure: isProductionEnv,
         sameSite: 'strict'
     });
 
@@ -86,4 +108,67 @@ export const login = asyncHandler(async (req, res) => {
             role: user.role,
         }
     });
+});
+
+export const logout = asyncHandler(async (req, res) => {
+    const user = await User.findOne({ refreshToken: req.cookies.refreshToken });
+    if (user) {
+        // Clear refresh token in database
+        user.refreshToken = undefined;
+        user.refreshTokenExpiresAt = undefined;
+        await user.save();
+    }
+
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+
+    res.status(HTTP_STATUS.OK).json({
+        message: "Logout successful"
+    });
+})
+
+export const refreshTokens = asyncHandler(async (req, res) => {
+    const { refreshToken } = req.cookies;
+
+    if (!refreshToken) {
+        return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+            message: "Refresh token required"
+        });
+    }
+
+    try {
+        // verify refresh token
+        const decoded = jwt.verify(refreshToken, REFRESH_JWT_SECRET);
+        // Find user with this refresh token
+        const user = await User.findOne({
+            refreshToken,
+            refreshTokenExpiresAt: { $gt: new Date() }
+        })
+
+        if (!user) {
+            return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+                message: 'Invalid or expired refresh token'
+            });
+        }
+
+        // GEnerate new access token
+        const newAccessToken = generateAccessToken(user);
+
+        res.cookie('accessToken', newAccessToken, {
+            maxAge: 1000 * 60 * 60, // 1 hour
+            httpOnly: true,
+            secure: isProductionEnv,
+            sameSite: 'Strict'
+        });
+
+        res.status(HTTP_STATUS.OK).json({
+            message: "Token refresh successfully"
+        });
+
+    } catch (error) {
+        console.error("RefreshTokens Error", error);
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            error: "Invalid Refresh token"
+        })
+    }
 });

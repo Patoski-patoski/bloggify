@@ -21,7 +21,7 @@
             <div class="carousel-inner">
                 <% featuredPosts.forEach((post, index) => { %>
                     <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-                        <img src="<%= post.image || ('/img/carousel-' + (index + 1) + '.jpg') %>" class="d-block w-100" alt="Featured Blog <%= index + 1 %>">
+                        <img src="<%= post.image || ('/img/carousel-' + (Math.round(Math.random() * 2 + 1)) + '.jpg') %> " class="d-block w-100" alt="Featured Blog <%= index + 1 %>">
                         <div class="carousel-caption d-none d-md-block">
                             <a style="color: #fff; text-decoration: none" href="/blogs/<%= post.slug %>">
                                 <h1><%= post.title %></h1>

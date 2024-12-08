@@ -73,12 +73,10 @@ async function loginBlog() {
                 // Handle invalid credentials
                 const emailErrorElem = document.querySelector('#login-email').nextElementSibling;
                 const passwordErrorElem = document.querySelector('#login-password').nextElementSibling;
-                if (emailErrorElem) {
-                    emailErrorElem.textContent = data.message;
-                }
-                if (passwordErrorElem) {
-                    passwordErrorElem.textContent = data.message;
-                }
+                
+                emailErrorElem && (emailErrorElem.textContent = data.message);
+                passwordErrorElem && (passwordErrorElem.textContent = data.message);
+
             } else {
                 throw new Error(data.message || 'Login failed');
             }

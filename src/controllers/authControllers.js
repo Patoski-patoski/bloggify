@@ -203,11 +203,7 @@ export const refreshTokens = asyncHandler(async (req, res) => {
             sameSite: 'Strict'
         });
 
-        res.status(HTTP_STATUS.OK).json({
-            message: "Tokens refreshed successfully",
-            accessToken: newAccessToken,
-            refreshToken: newRefreshToken // Corrected to return the new refresh token
-        });
+        return res.status(HTTP_STATUS.OK).render('create_blog');
 
     } catch (error) {
         console.error("RefreshTokens Error", error);

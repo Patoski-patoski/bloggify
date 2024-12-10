@@ -13,6 +13,7 @@ import morgan from "morgan";
 import config from './config.js';
 import authRouter from './src/routes/authRoutes.js';
 import blogRouter from './src/routes/blogRoutes.js';
+import profileRouter from './src/routes/profileRoutes.js';
 import { connectMongoDB } from './src/database/database.js';
 
 
@@ -44,6 +45,7 @@ app.set('view engine', 'ejs');
 // Routes
 app.use( authRouter );
 app.use( blogRouter );
+app.use( profileRouter);
 
 connectMongoDB();
 

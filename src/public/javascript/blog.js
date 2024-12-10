@@ -99,12 +99,11 @@ document.getElementById('save-draft')?.addEventListener('click', async (event) =
     setTimeout(() => {
         draftButton.ariaDisabled = false;
         draftButton.disabled = false;
-    }, 3000);
+    }, 5000);
 });
 
 document.getElementById('publish-blog-btn')?.addEventListener('click', async (event) => {
     event.preventDefault(event);
-    alert("Just clicked");
     const publishButton = document.getElementById('publish-blog-btn');
     publishButton.ariaDisabled = true;
     publishButton.disabled = true;
@@ -154,7 +153,6 @@ function previewImage(event) {
 }
 
 document.getElementById('image-input')?.addEventListener('change', (event) => {
-    // event.preventDefault();
     previewImage(event);
 });
 

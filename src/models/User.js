@@ -28,7 +28,9 @@ const userSchema = new Schema({
     password: {
         type: String,
         required: true,
-        minlength: 6
+        minlength: 6,
+        select: false  // Prevents returning this field in queries
+
     },
     role: {
         type: String,
@@ -55,7 +57,7 @@ const userSchema = new Schema({
     },
     refreshToken: {
         type: String,
-        select: false  // Prevents returning this field in queries
+        select: false 
     },
     refreshTokenExpiresAt: {
         type: Date

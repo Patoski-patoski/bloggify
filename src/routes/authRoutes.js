@@ -13,7 +13,6 @@ authRouter.get('/single', (_req, res, next) => res.render('single'));
 
 authRouter.post('/register', register);
 authRouter.post('/login', login);
-// authRouter.post('/create', refreshTokens);
 authRouter.post('/logout', logout);
 
 export default authRouter;

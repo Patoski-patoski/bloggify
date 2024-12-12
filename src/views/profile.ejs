@@ -52,7 +52,7 @@
             <div class="col-12 mb-5">
                 <div class="row text-center">
                     <div class="col-md-4">
-                        <h4><%= user.totalBlogs || 0 %></h4>
+                        <h4><%= countPublishedBlog || 0 %></h4>
                         <p class="text-muted">Published Blogs</p>
                     </div>
                     <div class="col-md-4">
@@ -74,7 +74,7 @@
                             Published Blogs
                         </button>
                     </li>
-                    <% if (true) { %>
+                    <% if (locals.user) { %>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="drafts-tab" data-bs-toggle="tab" data-bs-target="#drafts" type="button" role="tab">
                                 Drafts
@@ -119,8 +119,8 @@
                         <!-- Pagination for Published Blogs -->
                         <nav aria-label="Published blogs pagination" class="mt-4">
                             <ul class="pagination justify-content-center">
-                                <% for (let i = 1; i <= blogs; i++) { %>
-                                    <li class="page-item <%= i === blogs ? 'active' : '' %>">
+                                <% for (let i = 1; i <= totalPublishedPages; i++) { %>
+                                    <li class="page-item <%= i === currentPublishedPage ? 'active' : '' %>">
                                         <a class="page-link" href="?published_page=<%= i %>"><%= i %></a>
                                     </li>
                                 <% } %>
@@ -129,32 +129,32 @@
                     </div>
 
                     <!-- Drafts Tab (Only visible for own profile) -->
-                    <% if (true) { %>
+                    <% if (locals.user) { %>
                         <div class="tab-pane fade" id="drafts" role="tabpanel">
                             <div class="row">
-                                <% blogs.forEach(blog => { %>
+                                <% drafts.forEach(draft => { %>
                                     <div class="col-md-4 mb-4">
                                         <div class="card h-100">
                                             <img 
-                                                src="<%= blog.image || '/img/blog-draft.jpg' %>" 
+                                                src="<%= draft.image || '/img/blog-draft.jpg' %>" 
                                                 class="card-img-top" 
-                                                alt="<%= blog.title %>"
+                                                alt="<%= draft.title %>"
                                             >
                                             <div class="card-body">
-                                                <h5 class="card-title"><%= blog.title %></h5>
+                                                <h5 class="card-title"><%= draft.title %></h5>
                                                 <p class="card-text text-muted">Draft</p>
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <small class="text-muted">
                                                         Last edited: 
-                                                        <%= new Date(blog.updatedAt).toLocaleDateString('en-US', {
+                                                        <%= new Date(draft.updatedAt).toLocaleDateString('en-US', {
                                                             month: 'short', 
                                                             day: 'numeric', 
                                                             year: 'numeric'
                                                         }) %>
                                                     </small>
                                                     <div>
-                                                        <a href="/blogs/edit/<%= blog.slug %>" class="btn btn-sm btn-outline-secondary me-2">Edit</a>
-                                                        <a href="/blogs/publish/<%= blog.slug %>" class="btn btn-sm btn-primary">Publish</a>
+                                                        <a href="/blogs/edit/<%= draft.slug %>" class="btn btn-sm btn-outline-secondary me-2">Edit</a>
+                                                        <a href="/blogs/publish/<%= draft.slug %>" class="btn btn-sm btn-primary">Publish</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -166,7 +166,7 @@
                             <!-- Pagination for Drafts -->
                             <nav aria-label="Drafts pagination" class="mt-4">
                                 <ul class="pagination justify-content-center">
-                                    <% for (let i = 1; i <= blogs; i++) { %>
+                                    <% for (let i = 1; i <= drafts; i++) { %>
                                         <li class="page-item <%= i === currentDraftPage ? 'active' : '' %>">
                                             <a class="page-link" href="?drafts_page=<%= i %>"><%= i %></a>
                                         </li>

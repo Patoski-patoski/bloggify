@@ -8,6 +8,8 @@ import { profile } from '../controllers/profileController.js';
 const profileRouter = Router()
 
 // profile page
-profileRouter.get('/profile', profile);
+profileRouter.get('/profile', authenticateToken, profile);
+//  Get a user profile
+profileRouter.get('/profile:author', )
 
 export default profileRouter;

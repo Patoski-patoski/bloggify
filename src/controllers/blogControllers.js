@@ -120,7 +120,6 @@ export const getPostsByAuthor = asyncHandler(async( req, res) => {
     if (!user) {
         // Check if it's an API request or browser request
         if (req.headers.accept.includes('application/json')) {
-            // API-style response
             return res.status(HTTP_STATUS.NOT_FOUND).json({
                 message: 'Author not found',
                 error: true

@@ -6,6 +6,7 @@ import { HTTP_STATUS } from '../../constant.js';
 import generateUniqueSlug from '../utils/slugify.js';
 import asyncHandler from 'express-async-handler';
 import multer from 'multer';
+import {getBlogsByAuthor, findUserByUsername} from '../services/blogServices.js';
 
 // configure multer storage
 
@@ -85,17 +86,10 @@ export const getPostsBySlug = asyncHandler(async (req, res) => {
     )
 
     const author = await User.findOne({ _id: blog.author });
-    const acceptHeader = req.get('Accept');
-    const username = author.username;
 
-    if (acceptHeader && acceptHeader.includes('text/html')) {
-        return res.render('new_blog', { blog, username });
-    }
-    return res.status(HTTP_STATUS.OK).json({
-        message: "Published posts",
-        blog,
-        username
-    });
+    const username = author.username;
+    return res.render('new_blog', { blog, username });
+   
 });
 
 // Search and GET all published post
@@ -103,6 +97,13 @@ export const getAllPublishedBlogs = asyncHandler(async (_req, res) => {
     const publishedBlogs = await Blog.find({ status: 'published' })
         .sort({ createdAt: -1 })
         .select('-__v -comments -author');
+    
+        if(!publishedBlogs){
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                message: " No blogs Posts",
+                blogs: []
+            });
+        }
 
     return res.status(HTTP_STATUS.OK).json({
         message: "List of published posts",
@@ -111,22 +112,37 @@ export const getAllPublishedBlogs = asyncHandler(async (_req, res) => {
 });
 
 // Search and GET post by author name
-export const getPostsByAuthor = asyncHandler(async (req, res) => {
-    const { username } = req.params;
+export const getPostsByAuthor = asyncHandler(async( req, res) => {
+    const {username} = req.params;
+    const page = parseInt(req.query.page) || 1;
 
-    const user = await User.findOne({ username });
-    if (!user) return res.status(HTTP_STATUS.NOT_FOUND).json({
-        message: "Author not found"
+    const user = await findUserByUsername(username);
+    if (!user) {
+        // Check if it's an API request or browser request
+        if (req.headers.accept.includes('application/json')) {
+            // API-style response
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                message: 'Author not found',
+                error: true
+            });
+        } else {
+            // Render error page for browser requests
+            return res.status(HTTP_STATUS.NOT_FOUND).render('error', {
+                message: `Author "${username}" not found`,
+                statusCode: HTTP_STATUS.NOT_FOUND
+            });
+        }
+    }
+
+    const {blogs, totalPages, currentPage, totalBlogs} = await getBlogsByAuthor(user._id, page);
+    return res.status(HTTP_STATUS.OK).render('author', {
+        user,
+        blogs,
+        totalPublishedPages: totalPages,
+        currentPublishedPage: currentPage,
+        countPublishedBlog: totalBlogs
     });
 
-    const authorBlogs = await Blog.find({ status: 'published', author: user._id })
-        .sort({ createdAt: -1 })
-        .select('-__v -comments');
-
-    return res.status(HTTP_STATUS.OK).json({
-        message: `List of published posts by ${username}`,
-        blogs: authorBlogs
-    });
 });
 
 // delete a blog
@@ -142,7 +158,7 @@ export const deleteBlog = asyncHandler(async (req, res) => {
 
 export const getBlogs = async (req, res) => {
     try {
-        // Get featured posts (you can determine featured posts based on views, likes, etc.)
+        // Get featured posts (One can determine featured posts based on views, likes, etc.)
         const featuredPosts = await Blog.find({ status: 'published' })
             .sort({ 'meta.views': -1 })
             .limit(5)

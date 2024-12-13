@@ -15,6 +15,8 @@ import authRouter from './src/routes/authRoutes.js';
 import blogRouter from './src/routes/blogRoutes.js';
 import profileRouter from './src/routes/profileRoutes.js';
 import { connectMongoDB } from './src/database/database.js';
+import { errorHandler } from './src/middleware/errorHandler.js';
+
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -46,6 +48,9 @@ app.set('view engine', 'ejs');
 app.use( authRouter );
 app.use( blogRouter );
 app.use( profileRouter);
+
+// Global middlewares
+app.use(errorHandler);
 
 connectMongoDB();
 

@@ -30,7 +30,6 @@ const userSchema = new Schema({
         required: true,
         minlength: 6,
         select: false  // Prevents returning this field in queries
-
     },
     role: {
         type: String,

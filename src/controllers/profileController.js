@@ -2,12 +2,13 @@
 import asyncHandler from 'express-async-handler';
 import Blog from '../models/Blog.js';
 import User from '../models/User.js';
+import { HTTP_STATUS } from '../../constant.js';
 
 export const profile = asyncHandler(async (req, res) => {
     const user = await User.findOne({ refreshToken: req.cookies.refreshToken });
     
     if (!user) {
-        return res.status(401).redirect('/login');
+        return res.status(HTTP_STATUS.NOT_FOUND).redirect('/login');
     }
 
     const page = parseInt(req.query.published_page) || 1;
@@ -28,7 +29,7 @@ export const profile = asyncHandler(async (req, res) => {
 
     const totalPublishedPages = Math.ceil(countPublishedBlog / limit);
 
-    return res.render('profile', {
+    return res.status(HTTP_STATUS.OK).render('profile', {
         user,
         blogs,
         drafts,
@@ -38,8 +39,3 @@ export const profile = asyncHandler(async (req, res) => {
         currentDraftPage: draftsPage
     });
 });
-export const userProfile = asyncHandler(async (req, res) => {
-    const { author } = req.params;
-    const blogs = await Blog.find({ username: author, status: 'published' });
-
-})

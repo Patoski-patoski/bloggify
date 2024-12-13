@@ -39,6 +39,8 @@ blogRouter.get('/blogs', getBlogs);
 blogRouter.post('/blogs', authenticateToken, authorizeRole('author'), postBlog);
 // Get published blogs by slug
 blogRouter.get('/blogs/:slug', getPostsBySlug);
+// Get all published blogs 
+blogRouter.get('/all', getAllPublishedBlogs);
 // Update a blog by slug
 blogRouter.put('/blogs/:slug', authenticateToken, authorizeRole('author'), updateBlog);
 // DELETE a blog by slug
@@ -55,8 +57,8 @@ blogRouter.put('/:slug', authenticateToken, authorizeRole('author'), updateBlog)
 // blogRouter.get('/blogs', getAllPublishedBlogs);
 
 // Get published blogs by author name
-// blogRouter.get('/author/:username', getPostsByAuthorAPI);
+blogRouter.get('/author/:username', getPostsByAuthor);
 
-blogRouter.get('/search/api', searchBlogs);
+// blogRouter.get('/search/api', searchBlogs);
 
 export default blogRouter;

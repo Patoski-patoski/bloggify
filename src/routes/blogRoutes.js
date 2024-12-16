@@ -51,10 +51,10 @@ blogRouter.get('/create', authenticateToken, authorizeRole('author'), (req, res,
 });
 
 // Update a POST
-blogRouter.put('/:slug', authenticateToken, authorizeRole('author'), updateBlog);
+blogRouter.put('blogs/:slug', authenticateToken, authorizeRole('author'), updateBlog);
 
 // Get all published blogs
-// blogRouter.get('/blogs', getAllPublishedBlogs);
+// blogRouter.get('/all', getAllPublishedBlogs);
 
 // Get published blogs by author name
 blogRouter.get('/author/:username', getPostsByAuthor);

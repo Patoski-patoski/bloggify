@@ -5,22 +5,8 @@ import User from '../models/User.js';
 import { HTTP_STATUS } from '../../constant.js';
 import generateUniqueSlug from '../utils/slugify.js';
 import asyncHandler from 'express-async-handler';
-import multer from 'multer';
 import {getBlogsByAuthor, findUserByUsername} from '../services/blogServices.js';
 
-// configure multer storage
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
-    }
-});
-
-// File upload middleware 
-const upload = multer({ storage: storage });
 
 // POST a blog
 export const postBlog = asyncHandler(async (req, res) => {
@@ -86,10 +72,8 @@ export const getPostsBySlug = asyncHandler(async (req, res) => {
     )
 
     const author = await User.findOne({ _id: blog.author });
-
     const username = author.username;
     return res.render('new_blog', { blog, username });
-   
 });
 
 // Search and GET all published post
@@ -113,7 +97,7 @@ export const getAllPublishedBlogs = asyncHandler(async (_req, res) => {
 
 // Search and GET post by author name
 export const getPostsByAuthor = asyncHandler(async( req, res) => {
-    const {username} = req.params;
+    const { username } = req.params;
     const page = parseInt(req.query.page) || 1;
 
     const user = await findUserByUsername(username);
@@ -134,6 +118,8 @@ export const getPostsByAuthor = asyncHandler(async( req, res) => {
     }
 
     const {blogs, totalPages, currentPage, totalBlogs} = await getBlogsByAuthor(user._id, page);
+    console.log('totalPublishedPages', totalPages);
+    console.log('currentPublishedPage', currentPage);
     return res.status(HTTP_STATUS.OK).render('author', {
         user,
         blogs,
@@ -141,7 +127,6 @@ export const getPostsByAuthor = asyncHandler(async( req, res) => {
         currentPublishedPage: currentPage,
         countPublishedBlog: totalBlogs
     });
-
 });
 
 // delete a blog

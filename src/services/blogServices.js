@@ -4,7 +4,6 @@ import Blog from '../models/Blog.js';
 import {HTTP_STATUS} from '../../constant.js';
 
 export const findUserByUsername = async(username) => {
-    console.log("\n\nUser\n==", await User.findOne({username}));
     return await User.findOne({username});
 };
 

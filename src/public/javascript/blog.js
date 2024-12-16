@@ -6,11 +6,6 @@ tinymce.init({
     plugins: [
         // Core editing features
         'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
-        // Your account includes a free trial of TinyMCE premium features
-        // Try the most popular premium features until Dec 13, 2024:
-        'checklist', 'mediaembed', 'casechange', 'export', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown',
-        // Early access to document converters
-        'importword', 'exportword', 'exportpdf'
     ],
     toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
     tinycomments_mode: 'embedded',
@@ -81,7 +76,7 @@ function showAlert(message, type = 'success') {
     }, 5000);
 }
 
-document.getElementById('save-draft')?.addEventListener('click', async (event) => {
+document.getElementById('save-draft-btn')?.addEventListener('click', async (event) => {
     event.preventDefault();
 
     const draftButton = document.getElementById('save-draft-btn');
@@ -136,31 +131,29 @@ document.getElementById('subtitle')?.addEventListener('input', function () {
 });
 
 
-// Image manipulation and upload
 function previewImage(event) {
     const imagePreview = document.getElementById("imagePreview");
     const file = event.target.files[0];
-    console.log('file', file);
     if (file) {
         const reader = new FileReader();
-        console.log('reader', reader);
         reader.onload = function () {
-            imagePreview.src = reader.result;
-            imagePreview.style.display = "block";
+            imagePreview.src = reader.result; // Set the src of the image to the file's data URL
+            imagePreview.style.display = "block"; // Show the image
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(file); // Read the file as a data URL
+    } else {
+        imagePreview.style.display = "none"; // Hide the image if no file is selected
     }
 }
-
-document.getElementById('image-input')?.addEventListener('change', (event) => {
+document.getElementById('image')?.addEventListener('change', (event) => {
     previewImage(event);
 });
-
 document.getElementById("unsplashSearch").addEventListener(
     "input", async function () {
         const query = this.value;
         const gallery = document.getElementById("unsplashGallery");
         gallery.innerHTML = ""; // Clear previous results
+        document.getElementById('image').value = ''; // Clear previous results
 
         if (query.length > 2) {
             const response = await fetch(
@@ -171,7 +164,8 @@ document.getElementById("unsplashSearch").addEventListener(
             data.results.forEach((image) => {
                 const imgElement = document.createElement("img");
                 imgElement.src = image.urls.small;
-                // to get an array of unsplash image, get from imgElement.src and store in an array
+
+                // to get an array of unsplash images, get from imgElement.src and store in an array
                 // console.log("img element", imgElement.src);
                 imgElement.alt = image.description || "Unsplash Image";
                 imgElement.className = "img-thumbnail";
@@ -188,7 +182,6 @@ function selectUnsplashImage(imageUrl) {
     const imagePreview = document.getElementById("imagePreview");
     imagePreview.src = imageUrl;
     console.log('imagePreview.src', imagePreview.src);
-    
     imagePreview.style.display = "block";
 
     // Close modal

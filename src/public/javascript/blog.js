@@ -44,7 +44,7 @@ async function publishBlog(formData) {
 // Save as draft function
 async function saveDraft(formData) {
     try {
-        const response = await fetch('/blogs', {
+        const response = await fetch('/edit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
@@ -98,7 +98,8 @@ document.getElementById('save-draft-btn')?.addEventListener('click', async (even
 });
 
 document.getElementById('publish-blog-btn')?.addEventListener('click', async (event) => {
-    event.preventDefault(event);
+    event.preventDefault();
+
     const publishButton = document.getElementById('publish-blog-btn');
     publishButton.ariaDisabled = true;
     publishButton.disabled = true;
@@ -107,7 +108,7 @@ document.getElementById('publish-blog-btn')?.addEventListener('click', async (ev
         title: document.getElementById('title').value,
         subtitle: document.getElementById('subtitle').value,
         content: tinymce.get('content').getContent(),
-        image: document.getElementById("imagePreview").src,
+        image: document.querySelector(".imagePreview").src,
         status: 'published'
     };
     await publishBlog(formData);
@@ -132,7 +133,7 @@ document.getElementById('subtitle')?.addEventListener('input', function () {
 
 
 function previewImage(event) {
-    const imagePreview = document.getElementById("imagePreview");
+    const imagePreview = document.querySelector(".imagePreview");
     const file = event.target.files[0];
     if (file) {
         const reader = new FileReader();
@@ -179,7 +180,7 @@ document.getElementById("unsplashSearch").addEventListener(
     });
 
 function selectUnsplashImage(imageUrl) {
-    const imagePreview = document.getElementById("imagePreview");
+    const imagePreview = document.querySelector(".imagePreview");
     imagePreview.src = imageUrl;
     console.log('imagePreview.src', imagePreview.src);
     imagePreview.style.display = "block";

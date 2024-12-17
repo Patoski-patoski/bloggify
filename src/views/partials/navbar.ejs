@@ -9,13 +9,13 @@
             <ul class="navbar-nav ms-auto">
                 <% if (locals.user) { %>
                     <li class="nav-item">
+                        <a style="color: #9198a1" class="nav-link" href="/create">Create blog</a>
+                    </li>
+                    <li class="nav-item">
                         <a style="color: #9198a1" class="nav-link" href="/profile">Profile</a>
                     </li>
                     <li class="nav-item">
                         <a style="color: #9198a1" class="nav-link" href="/logout">Logout</a>
-                    </li>
-                    <li class="nav-item">
-                        <a style="color: #9198a1" class="nav-link" href="/blogs">Read blogs</a>
                     </li>
                 <% } else { %>
                     <li class="nav-item">

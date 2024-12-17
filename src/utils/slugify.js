@@ -1,3 +1,4 @@
+// utils/slugify.js
 import slugify from 'slugify';
 import Blog from '../models/Blog.js';
 
@@ -6,13 +7,17 @@ const generateUniqueSlug = async (title) => {
         let slug = slugify(title, { lower: true, trim: true });
         console.log('slug', slug);
         let exists = await Blog.findOne({ slug });
+        console.log('exists_1', exists);
         let count = 1;
 
         while (exists) {
             slug = `${slugify(title, { lower: true })}-${count}`;
             exists = await Blog.findOne({ slug });
+            console.log('exists_2', exists);
             count++;
         }
+        console.log('slug_2', slug);
+
         return slug;
 
     } catch (error) {
@@ -22,3 +27,4 @@ const generateUniqueSlug = async (title) => {
 };
 
 export default generateUniqueSlug;
+    

@@ -121,7 +121,7 @@
                             <ul class="pagination justify-content-center">
                                 <% for (let i = 1; i <= totalPublishedPages; i++) { %>
                                     <li class="page-item <%= i === currentPublishedPage ? 'active' : '' %>">
-                                        <a class="page-link" href="?published_page=<%= i %>"><%= i %></a>
+                                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
                                     </li>
                                 <% } %>
                             </ul>
@@ -154,7 +154,6 @@
                                                     </small>
                                                     <div>
                                                         <a href="/blogs/edit/<%= draft.slug %>" class="btn btn-sm btn-outline-secondary me-2">Edit</a>
-                                                        <a href="/blogs/publish/<%= draft.slug %>" class="btn btn-sm btn-primary">Publish</a>
                                                     </div>
                                                 </div>
                                             </div>

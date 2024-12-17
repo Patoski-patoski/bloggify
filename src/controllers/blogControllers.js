@@ -38,6 +38,7 @@ export const postBlog = asyncHandler(async (req, res) => {
     }
 });
 
+
 // PUT a blog
 export const updateBlog = asyncHandler(async (req, res) => {
     const { slug } = req.params;
@@ -61,7 +62,35 @@ export const updateBlog = asyncHandler(async (req, res) => {
         blog
     });
 });
+// edit post by slug
+export const editPostsBySlug = asyncHandler(async (req, res) => { 
+    const { slug } = req.params;
 
+    const draft = await Blog.findOne({ slug, status: 'draft' });
+    if (!draft) return res.status(HTTP_STATUS.NOT_FOUND).render('error', {
+        statusCode: HTTP_STATUS.NOT_FOUND,
+        message: 'draft not found',
+        href: '/profile',
+    })
+    const author = await User.findOne({ _id: draft.author });
+    const user = await User.findOne({ id: req.user.userId });
+
+    if (author.id === user.id) {
+        return res.render('edit_blog', { 
+            title: draft.title,
+            subtitle: draft.subtitle,
+            image: draft.image,
+            content: draft.content,
+            unsplashAccessKey: process.env.UNSPLASH_ACCESS_KEY
+         });
+    }
+    return res.status(HTTP_STATUS.UNAUTHORIZED).render('error', {
+        statusCode: HTTP_STATUS.UNAUTHORIZED,
+        message: 'Unauthorized user',
+        href: '/blogs'
+    });
+    
+});
 // GET post by slug
 export const getPostsBySlug = asyncHandler(async (req, res) => {
     const { slug } = req.params;
@@ -106,20 +135,17 @@ export const getPostsByAuthor = asyncHandler(async( req, res) => {
         if (req.headers.accept.includes('application/json')) {
             return res.status(HTTP_STATUS.NOT_FOUND).json({
                 message: 'Author not found',
-                error: true
             });
         } else {
             // Render error page for browser requests
             return res.status(HTTP_STATUS.NOT_FOUND).render('error', {
                 message: `Author "${username}" not found`,
-                statusCode: HTTP_STATUS.NOT_FOUND
+                href: '/blogs'
             });
         }
     }
 
     const {blogs, totalPages, currentPage, totalBlogs} = await getBlogsByAuthor(user._id, page);
-    console.log('totalPublishedPages', totalPages);
-    console.log('currentPublishedPage', currentPage);
     return res.status(HTTP_STATUS.OK).render('author', {
         user,
         blogs,

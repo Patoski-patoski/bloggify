@@ -12,7 +12,7 @@ export const getBlogsByAuthor = async (userId, page = 1, limit = 6) => {
 
     const [blogs, totalCount] = await Promise.all([
         Blog.find({author: userId, status: 'published'})
-        .skip(skip)
+        .skip(skip) // if totalCount exceeds limit, it "skip" blogs documents 
         .limit(limit)
         .sort({createdAt: -1})
         .populate('author', 'username profilePicture bio'),

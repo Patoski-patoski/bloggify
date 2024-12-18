@@ -53,27 +53,6 @@ app.use( profileRouter);
 // Global middlewares
 app.use(errorHandler);
 
-// Set up storage for uploaded files
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
-    }
-});
-
-// File upload middleware 
-const upload = multer({ storage: storage });
-
-app.post('/upload', upload.single('file'), (req, res) => {
-    // 'file' corresponds to the name attribute in the input field
-    if (!req.file)
-        return res.status(400).send('No file uploaded');
-
-    res.status(200).json(`file upload successfully- ${req.file.originalname}`);
-});
-
 
 connectMongoDB();
 

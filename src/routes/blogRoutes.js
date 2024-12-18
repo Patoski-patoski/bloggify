@@ -5,7 +5,7 @@ import authorizeRole from '../middleware/authorize.js';
 import { authenticateToken } from '../controllers/authControllers.js';
 import {
     postBlog,
-    editPostsBySlug,
+    draftBlog,
     deleteBlog,
     getAllPublishedBlogs,
     searchBlogs,
@@ -32,17 +32,16 @@ import {
 
 const blogRouter = Router();
 
+
 // Render homepage
 blogRouter.get(['/home', '/'], (_req, res, next) => res.render('index'));
 // GET all blogs
 blogRouter.get('/blogs', getBlogs);
 // POST a blog
 blogRouter.post('/blogs', authenticateToken, authorizeRole('author'), postBlog);
-// Get edit blogs by slug
-blogRouter.get('/blogs/edit/:slug', authenticateToken, authorizeRole('author'), editPostsBySlug);
-// blogRouter.get('/blogs/edit/:slug', authenticateToken, authorizeRole('author'), (req, res, next) => {
-    // res.render('edit_blog', { unsplashAccessKey: process.env.UNSPLASH_ACCESS_KEY || undefined });
-// });
+// opne draft for editing by slug
+blogRouter.get('/blogs/edit/:slug', authenticateToken, authorizeRole('author'), draftBlog);
+
 // Get published blogs by slug
 blogRouter.get('/blogs/:slug', getPostsBySlug);
 // Get all published blogs 
@@ -53,7 +52,8 @@ blogRouter.put('/blogs/:slug', authenticateToken, authorizeRole('author'), updat
 blogRouter.delete('body/:slug', authenticateToken, authorizeRole('author'), deleteBlog);
 
 blogRouter.get('/create', authenticateToken, authorizeRole('author'), (req, res, next) => {
-    res.render('create_blog', { unsplashAccessKey: process.env.UNSPLASH_ACCESS_KEY || undefined });
+    res.render('create_blog', 
+        { unsplashAccessKey: process.env.UNSPLASH_ACCESS_KEY || undefined });
 });
 
 
@@ -67,5 +67,6 @@ blogRouter.put('blogs/:slug', authenticateToken, authorizeRole('author'), update
 blogRouter.get('/author/:username', getPostsByAuthor);
 
 // blogRouter.get('/search/api', searchBlogs);
+
 
 export default blogRouter;

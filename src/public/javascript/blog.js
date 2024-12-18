@@ -44,7 +44,7 @@ async function publishBlog(formData) {
 // Save as draft function
 async function saveDraft(formData) {
     try {
-        const response = await fetch('/edit', {
+        const response = await fetch('/blogs', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
@@ -54,10 +54,11 @@ async function saveDraft(formData) {
         if (response.ok) {
             showAlert('Draft saved successfully!', 'warning');
         } else {
+            alert(data.message)
             throw new Error(data.message || 'Failed to save draft');
         }
     } catch (error) {
-        console.error("Error Here", error);
+        console.error(error);
         showAlert(error.message, 'danger');
     }
 }
@@ -86,9 +87,11 @@ document.getElementById('save-draft-btn')?.addEventListener('click', async (even
     const formData = {
         title: document.getElementById('title').value,
         subtitle: document.getElementById('subtitle').value,
+        image: document.getElementById("imagePreview").src,
         content: tinymce.get('content').getContent(),
         status: 'draft'
     };
+    console.log('Draft formData', formData)
     await saveDraft(formData);
 
     setTimeout(() => {
@@ -108,7 +111,7 @@ document.getElementById('publish-blog-btn')?.addEventListener('click', async (ev
         title: document.getElementById('title').value,
         subtitle: document.getElementById('subtitle').value,
         content: tinymce.get('content').getContent(),
-        image: document.querySelector(".imagePreview").src,
+        image: document.getElementById("imagePreview").src,
         status: 'published'
     };
     await publishBlog(formData);
@@ -116,7 +119,7 @@ document.getElementById('publish-blog-btn')?.addEventListener('click', async (ev
     setTimeout(() => {
         publishButton.ariaDisabled = false;
         publishButton.disabled = false;
-    }, 3000);
+    }, 5000);
 });
 
 
@@ -133,12 +136,13 @@ document.getElementById('subtitle')?.addEventListener('input', function () {
 
 
 function previewImage(event) {
-    const imagePreview = document.querySelector(".imagePreview");
+    const imagePreview = document.getElementById("imagePreview");
     const file = event.target.files[0];
     if (file) {
         const reader = new FileReader();
         reader.onload = function () {
             imagePreview.src = reader.result; // Set the src of the image to the file's data URL
+            console.log("image source", imagePreview.src);
             imagePreview.style.display = "block"; // Show the image
         };
         reader.readAsDataURL(file); // Read the file as a data URL
@@ -147,6 +151,7 @@ function previewImage(event) {
     }
 }
 document.getElementById('image')?.addEventListener('change', (event) => {
+    alert('Changed');
     previewImage(event);
 });
 document.getElementById("unsplashSearch").addEventListener(
@@ -180,7 +185,7 @@ document.getElementById("unsplashSearch").addEventListener(
     });
 
 function selectUnsplashImage(imageUrl) {
-    const imagePreview = document.querySelector(".imagePreview");
+    const imagePreview = document.getElementById("imagePreview");
     imagePreview.src = imageUrl;
     console.log('imagePreview.src', imagePreview.src);
     imagePreview.style.display = "block";

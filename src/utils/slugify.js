@@ -5,19 +5,16 @@ import Blog from '../models/Blog.js';
 const generateUniqueSlug = async (title) => {
     try {
         let slug = slugify(title, { lower: true, trim: true });
-        console.log('slug', slug);
+        console.log('slug', slug)
         let exists = await Blog.findOne({ slug });
-        console.log('exists_1', exists);
+        console.log('exists', exists)
         let count = 1;
 
         while (exists) {
             slug = `${slugify(title, { lower: true })}-${count}`;
             exists = await Blog.findOne({ slug });
-            console.log('exists_2', exists);
             count++;
         }
-        console.log('slug_2', slug);
-
         return slug;
 
     } catch (error) {

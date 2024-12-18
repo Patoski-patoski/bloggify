@@ -5,7 +5,7 @@ import User from '../models/User.js';
 import { HTTP_STATUS } from '../../constant.js';
 import generateUniqueSlug from '../utils/slugify.js';
 import asyncHandler from 'express-async-handler';
-import {getBlogsByAuthor, findUserByUsername} from '../services/blogServices.js';
+import { getBlogsByAuthor, findUserByUsername} from '../services/blogServices.js';
 
 
 // POST a blog
@@ -39,6 +39,37 @@ export const postBlog = asyncHandler(async (req, res) => {
 });
 
 
+// open a draft for editing(and then post afterwards)
+export const draftBlog = asyncHandler(async (req, res) => { 
+    const { slug } = req.params;
+
+    const draft = await Blog.findOne({ slug, status: 'draft' });
+    if (!draft) return res.status(HTTP_STATUS.NOT_FOUND).render('error', {
+        statusCode: HTTP_STATUS.NOT_FOUND,
+        message: 'draft not found',
+        href: '/profile',
+    })
+    const author = await User.findOne({ _id: draft.author });
+    const user = await User.findOne({ id: req.user.userId });
+    console.log('draft image', draft.image);
+
+    if (author.id === user.id) {
+        return res.render('edit_blog', { 
+            title: draft.title,
+            subtitle: draft.subtitle,
+            image: draft.image,
+            content: draft.content,
+            unsplashAccessKey: process.env.UNSPLASH_ACCESS_KEY
+         });
+    }
+    return res.status(HTTP_STATUS.UNAUTHORIZED).render('error', {
+        statusCode: HTTP_STATUS.UNAUTHORIZED,
+        message: 'Unauthorized user',
+        href: '/blogs'
+    });
+    
+});
+
 // PUT a blog
 export const updateBlog = asyncHandler(async (req, res) => {
     const { slug } = req.params;
@@ -62,35 +93,7 @@ export const updateBlog = asyncHandler(async (req, res) => {
         blog
     });
 });
-// edit post by slug
-export const editPostsBySlug = asyncHandler(async (req, res) => { 
-    const { slug } = req.params;
 
-    const draft = await Blog.findOne({ slug, status: 'draft' });
-    if (!draft) return res.status(HTTP_STATUS.NOT_FOUND).render('error', {
-        statusCode: HTTP_STATUS.NOT_FOUND,
-        message: 'draft not found',
-        href: '/profile',
-    })
-    const author = await User.findOne({ _id: draft.author });
-    const user = await User.findOne({ id: req.user.userId });
-
-    if (author.id === user.id) {
-        return res.render('edit_blog', { 
-            title: draft.title,
-            subtitle: draft.subtitle,
-            image: draft.image,
-            content: draft.content,
-            unsplashAccessKey: process.env.UNSPLASH_ACCESS_KEY
-         });
-    }
-    return res.status(HTTP_STATUS.UNAUTHORIZED).render('error', {
-        statusCode: HTTP_STATUS.UNAUTHORIZED,
-        message: 'Unauthorized user',
-        href: '/blogs'
-    });
-    
-});
 // GET post by slug
 export const getPostsBySlug = asyncHandler(async (req, res) => {
     const { slug } = req.params;
@@ -243,3 +246,4 @@ export const searchBlogs = async (req, res) => {
         });
     }
 };
+

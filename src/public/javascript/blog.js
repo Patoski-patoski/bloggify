@@ -15,7 +15,33 @@ tinymce.init({
         { value: 'Email', title: 'Email' },
     ],
     ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+    setup: function (editor) {
+        // Add change event listener
+        editor.on('change', function () {
+            alert('Changed!!!');
+            const content = editor.getContent(); // Get the current content
+            console.log('Content changed:', content); // For debugging
+
+            // Call your save function here
+            setTimeout(() => { 
+                saveDraftContent(content);
+            }, 15000);
+        });
+    }
 });
+// Function to save the draft content
+async function saveDraftContent(content) {
+    const formData = {
+        title: document.getElementById('title').value,
+        subtitle: document.getElementById('subtitle').value,
+        image: document.getElementById("imagePreview").src,
+        content: content, // Use the updated content
+        status: 'draft'
+    };
+
+    console.log('Saving draft formData', formData);
+    await saveDraft(formData); // Assuming saveDraft is defined elsewhere
+}
 
 // Publish blog function
 async function publishBlog(formData) {
@@ -91,7 +117,6 @@ document.getElementById('save-draft-btn')?.addEventListener('click', async (even
         content: tinymce.get('content').getContent(),
         status: 'draft'
     };
-    console.log('Draft formData', formData)
     await saveDraft(formData);
 
     setTimeout(() => {
@@ -134,6 +159,8 @@ document.getElementById('subtitle')?.addEventListener('input', function () {
         `${this.value.length}/500 characters`;
 });
 
+tinymce.get('content').getContent(),
+
 
 function previewImage(event) {
     const imagePreview = document.getElementById("imagePreview");
@@ -157,6 +184,7 @@ document.getElementById('image')?.addEventListener('change', (event) => {
 document.getElementById("unsplashSearch").addEventListener(
     "input", async function () {
         const query = this.value;
+        alert('unsplash', query);
         const gallery = document.getElementById("unsplashGallery");
         gallery.innerHTML = ""; // Clear previous results
         document.getElementById('image').value = ''; // Clear previous results
@@ -166,7 +194,6 @@ document.getElementById("unsplashSearch").addEventListener(
                 `https://api.unsplash.com/search/photos?query=${query}&client_id=${UNSPLASH_ACCESS_KEY}`
             );
             const data = await response.json();
-
             data.results.forEach((image) => {
                 const imgElement = document.createElement("img");
                 imgElement.src = image.urls.small;

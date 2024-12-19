@@ -9,7 +9,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import morgan from "morgan";
-import multer from 'multer';
+
 
 import config from './config.js';
 import authRouter from './src/routes/authRoutes.js';

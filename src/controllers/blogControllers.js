@@ -18,6 +18,10 @@ export const postBlog = asyncHandler(async (req, res) => {
 
     try {
         const slug = await generateUniqueSlug(title);
+        const draft = await Blog.find({draft: "slug"});
+        if (draft) {
+            await Blog.deleteMany({ draft });
+        }
         const newBlog = await Blog.create({
             title,
             subtitle,
@@ -51,7 +55,6 @@ export const draftBlog = asyncHandler(async (req, res) => {
     })
     const author = await User.findOne({ _id: draft.author });
     const user = await User.findOne({ id: req.user.userId });
-    console.log('draft image', draft.image);
 
     if (author.id === user.id) {
         return res.render('edit_blog', { 

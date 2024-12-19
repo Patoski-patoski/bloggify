@@ -79,7 +79,19 @@ blogSchema.pre('save', function (next) {
         this.slug = slugify(this.title);
     }
     next();
-});``
+});
+blogSchema.pre('save', async function (next) {
+    if (!this.isModified('slug')) return next();
+
+    let count = 1;
+    let originalSlug = this.slug;
+    while (await Blog.findOne({ slug: this.slug })) {
+        this.slug = `${originalSlug}-${count}`;
+        count++;
+    }
+    next();
+});
+
 
 
 // The sensitive _id, author, __v, e.t.c fields will be excluded automatically.

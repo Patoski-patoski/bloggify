@@ -60,7 +60,7 @@ export const refreshTokens = asyncHandler(async (req, res) => {
             refreshToken: { value: newRefreshToken, maxAge: 7 * 24 * 3600 * 1000 },
         });
 
-        res.status(HTTP_STATUS.OK).json({ message: 'Tokens refreshed successfully' });
+        // res.status(HTTP_STATUS.OK).json({ message: 'Tokens refreshed successfully' });
     } catch (error) {
         console.error('RefreshTokens Error', error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Invalid Refresh token' });
@@ -69,14 +69,14 @@ export const refreshTokens = asyncHandler(async (req, res) => {
 
 
 // Helper to generate tokens
-const generateToken = (user, secret, expiresIn) => {
+export const generateToken = (user, secret, expiresIn) => {
     const payload = { userId: user.id, role: user.role, email: user.email };
     if (secret === REFRESH_JWT_SECRET) delete payload.role; // Exclude role for refresh token
     return jwt.sign(payload, secret, { expiresIn });
 };
 
 // Helper to handle token updates
-const updateRefreshTokenInDb = async (user, refreshToken) => {
+export const updateRefreshTokenInDb = async (user, refreshToken) => {
     user.refreshToken = refreshToken;
     user.refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
     await user.save();
@@ -84,7 +84,7 @@ const updateRefreshTokenInDb = async (user, refreshToken) => {
 
 
 // Helper to set cookies
-const setCookies = (res, tokens) => {
+export const setCookies = (res, tokens) => {
     Object.entries(tokens).forEach(([name, { value, maxAge }]) => {
          res.cookie(name, value, {
             maxAge,

@@ -159,8 +159,6 @@ document.getElementById('subtitle')?.addEventListener('input', function () {
         `${this.value.length}/500 characters`;
 });
 
-tinymce.get('content').getContent(),
-
 
 function previewImage(event) {
     const imagePreview = document.getElementById("imagePreview");
@@ -184,7 +182,6 @@ document.getElementById('image')?.addEventListener('change', (event) => {
 document.getElementById("unsplashSearch").addEventListener(
     "input", async function () {
         const query = this.value;
-        alert('unsplash', query);
         const gallery = document.getElementById("unsplashGallery");
         gallery.innerHTML = ""; // Clear previous results
         document.getElementById('image').value = ''; // Clear previous results

@@ -1,5 +1,6 @@
 // controllers/authControllers.js
 
+import { generateToken, updateRefreshTokenInDb, setCookies } from '../middleware/authenticate.js'
 import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';

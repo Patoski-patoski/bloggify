@@ -18,19 +18,23 @@ export const postBlog = asyncHandler(async (req, res) => {
 
     try {
         const slug = await generateUniqueSlug(title);
-        const draft = await Blog.find({draft: "slug"});
-        if (draft) {
-            await Blog.deleteMany({ draft });
-        }
-        const newBlog = await Blog.create({
+        const newBlog = await Blog.findOneAndUpdate(
+            { slug },
+            {
             title,
             subtitle,
             content,
             status,
+            updatedAt: new Date(),
             slug,
             image,
-            author: user._id
-        });
+            author: user._id,
+            }, // Update or create with these fields
+            {
+                new: true,
+                upsert: true,
+            }
+        );
 
         return res.status(HTTP_STATUS.CREATED).json(
             { message: "Blog post created", blog: newBlog });
@@ -101,15 +105,37 @@ export const updateBlog = asyncHandler(async (req, res) => {
 export const getPostsBySlug = asyncHandler(async (req, res) => {
     const { slug } = req.params;
 
+    // Find the blog with the current slug
     const blog = await Blog.findOne({ slug, status: 'published' });
-    if (!blog) return res.status(HTTP_STATUS.NOT_FOUND).json(
-        { message: "Blog not found" }
-    )
+    if (!blog) {
+        return res.status(HTTP_STATUS.NOT_FOUND).render('unauthorized', {
+            message: "Blog not found",
+        });
+    }
 
+    // Find the author of the blog
     const author = await User.findOne({ _id: blog.author });
+    if (!author) {
+        return res.status(HTTP_STATUS.NOT_FOUND).render('unauthorized', {
+            message: "Author not found",
+        });
+    }
+
+    // Fetch more blogs from the same author, excluding the current blog
+    const moreBlogsFromAuthor = await Blog.find({
+        author: author._id,
+        status: "published",
+        _id: { $ne: blog._id }, // Exclude the current blog by ID
+
+    })
+        .limit(6);
+
     const username = author.username;
-    return res.render('new_blog', { blog, username });
+
+    // Render the view with the blog and more blogs
+    return res.render('new_blog', { blog, username, moreBlogsFromAuthor });
 });
+
 
 // Search and GET all published post
 export const getAllPublishedBlogs = asyncHandler(async (_req, res) => {

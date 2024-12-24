@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
+import asyncHandler from 'express-async-handler';
 
 import Blog from '../models/Blog.js';
 import User from '../models/User.js';
-import asyncHandler from 'express-async-handler';
 import { HTTP_STATUS } from '../../constant.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -11,7 +11,7 @@ const isProductionEnv = process.env.NODE_ENV === 'production';
 
 
 // Authenticate token middleware
-export const authenticateToken = (req, res, next) => {
+export const authenticateToken = async (req, res, next) => {
     const accessToken = req.cookies.accessToken;
     const refreshToken = req.cookies.refreshToken;
 
@@ -19,7 +19,8 @@ export const authenticateToken = (req, res, next) => {
         if (!refreshToken) {
             return res.status(HTTP_STATUS.FORBIDDEN).json({ message: 'Access token is required' });
         }
-        return refreshTokens(req, res);
+        await refreshTokens(req, res, next);  // Pass `next` to proceed after refreshing tokens.
+        return;
     }
 
     try {
@@ -28,20 +29,23 @@ export const authenticateToken = (req, res, next) => {
         res.locals.user = decoded;
         next();
     } catch {
-        res.status(HTTP_STATUS.FORBIDDEN).json({ message: 'Invalid or expired access token' });
+        if (refreshToken) {
+            await refreshTokens(req, res, next); // Try refreshing if accessToken is invalid.
+        } else {
+            res.status(HTTP_STATUS.FORBIDDEN).json({ message: 'Invalid or expired access token' });
+        }
     }
 };
 
 // Refresh tokens
-export const refreshTokens = asyncHandler(async (req, res) => {
+export const refreshTokens = asyncHandler(async (req, res, next) => {
     const { refreshToken } = req.cookies;
     if (!refreshToken) {
         return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: 'Refresh token required' });
     }
 
     try {
-        jwt.verify(refreshToken, REFRESH_JWT_SECRET);
-
+        const decoded = jwt.verify(refreshToken, REFRESH_JWT_SECRET);
         const user = await User.findOne({
             refreshToken,
             refreshTokenExpiresAt: { $gt: new Date() },
@@ -60,7 +64,12 @@ export const refreshTokens = asyncHandler(async (req, res) => {
             refreshToken: { value: newRefreshToken, maxAge: 7 * 24 * 3600 * 1000 },
         });
 
-        // res.status(HTTP_STATUS.OK).json({ message: 'Tokens refreshed successfully' });
+        req.user = docoded;
+        req.user = decoded;
+
+        if(next) next();
+
+        res.status(HTTP_STATUS.OK).json({ message: 'Tokens refreshed successfully' });
     } catch (error) {
         console.error('RefreshTokens Error', error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Invalid Refresh token' });

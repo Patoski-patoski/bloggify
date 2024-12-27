@@ -31,10 +31,6 @@ const blogSchema = new Schema({
         required: [true, 'Content is required'],
         minlength: [20, 'Content must be at least 20 characters']
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
     status: {
         type: String,
         enum: ['draft', 'published', 'archived'],

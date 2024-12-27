@@ -3,7 +3,6 @@
 import { generateToken, updateRefreshTokenInDb, setCookies } from '../middleware/authenticate.js'
 import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 
 import { HTTP_STATUS, SALT_ROUNDS } from '../../constant.js';
 import User from '../models/User.js';

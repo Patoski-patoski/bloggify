@@ -49,7 +49,7 @@ export default {
             max: 130,
             skipSuccessfulRequests: true,
             message: "To many requests, Please try again later",
-            keyGenerator: (req, res) => {
+            keyGenerator: (req) => {
                 // Use X-Forwarded-For header if trust proxy is set
                 return req.headers['x-forwarded-for'] || req.connection.remoteAddress;
             }

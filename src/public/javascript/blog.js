@@ -1,6 +1,7 @@
 // public/javascript/blog.js
 // Initialize TinyMCE
 
+// eslint-disable-next-line no-undef
 tinymce.init({
     selector: 'textarea',
     plugins: [
@@ -39,7 +40,6 @@ async function saveDraftContent(content) {
         status: 'draft'
     };
 
-    console.log('Saving draft formData', formData);
     await saveDraft(formData); // Assuming saveDraft is defined elsewhere
 }
 
@@ -114,6 +114,7 @@ document.getElementById('save-draft-btn')?.addEventListener('click', async (even
         title: document.getElementById('title').value,
         subtitle: document.getElementById('subtitle').value,
         image: document.getElementById("imagePreview").src,
+        // eslint-disable-next-line no-undef
         content: tinymce.get('content').getContent(),
         status: 'draft'
     };
@@ -135,6 +136,7 @@ document.getElementById('publish-blog-btn')?.addEventListener('click', async (ev
     const formData = {
         title: document.getElementById('title').value,
         subtitle: document.getElementById('subtitle').value,
+        // eslint-disable-next-line no-undef
         content: tinymce.get('content').getContent(),
         image: document.getElementById("imagePreview").src,
         status: 'published'
@@ -167,7 +169,6 @@ function previewImage(event) {
         const reader = new FileReader();
         reader.onload = function () {
             imagePreview.src = reader.result; // Set the src of the image to the file's data URL
-            console.log("image source", imagePreview.src);
             imagePreview.style.display = "block"; // Show the image
         };
         reader.readAsDataURL(file); // Read the file as a data URL
@@ -187,9 +188,8 @@ document.getElementById("unsplashSearch").addEventListener(
         document.getElementById('image').value = ''; // Clear previous results
 
         if (query.length > 2) {
-            const response = await fetch(
-                `https://api.unsplash.com/search/photos?query=${query}&client_id=${UNSPLASH_ACCESS_KEY}`
-            );
+            // eslint-disable-next-line no-undef
+            const response = await fetch(`https://api.unsplash.com/search/photos?query=${query}&client_id=${UNSPLASH_ACCESS_KEY}`);
             const data = await response.json();
             data.results.forEach((image) => {
                 const imgElement = document.createElement("img");
@@ -216,6 +216,8 @@ function selectUnsplashImage(imageUrl) {
 
     // Close modal
     const unsplashModal = document.getElementById("unsplashModal");
+    // eslint-disable-next-line no-undef
     const modalInstance = bootstrap.Modal.getInstance(unsplashModal);
+    console.log(modalInstance);
     modalInstance.hide();
 }

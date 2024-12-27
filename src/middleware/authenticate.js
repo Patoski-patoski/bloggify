@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
 
-import Blog from '../models/Blog.js';
 import User from '../models/User.js';
 import { HTTP_STATUS } from '../../constant.js';
 
@@ -64,7 +63,6 @@ export const refreshTokens = asyncHandler(async (req, res, next) => {
             refreshToken: { value: newRefreshToken, maxAge: 7 * 24 * 3600 * 1000 },
         });
 
-        req.user = docoded;
         req.user = decoded;
 
         if(next) next();

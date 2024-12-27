@@ -12,7 +12,7 @@ export async function connectMongoDB() {
         });
         console.log('mongoDB connected');
     } catch (error) {
-        console.error('Failed to connect to mongogDB', err);
+        console.error('Failed to connect to mongogDB', error);
         process.exit(1);
     }
 }

@@ -8,7 +8,6 @@ import {
     draftBlog,
     deleteBlog,
     getAllPublishedBlogs,
-    searchBlogs,
     getBlogs,
     getPostsByAuthor,
     getPostsBySlug,
@@ -34,7 +33,7 @@ const blogRouter = Router();
 
 
 // Render homepage
-blogRouter.get(['/home', '/'], (_req, res, next) => res.render('index'));
+blogRouter.get(['/home', '/'], (_req, res) => res.render('index'));
 // GET all blogs
 blogRouter.get('/blogs', getBlogs);
 // POST a blog
@@ -51,7 +50,7 @@ blogRouter.put('/blogs/:slug', authenticateToken, authorizeRole('author'), updat
 // DELETE a blog by slug
 blogRouter.delete('body/:slug', authenticateToken, authorizeRole('author'), deleteBlog);
 
-blogRouter.get('/create', authenticateToken, authorizeRole('author'), (req, res, next) => {
+blogRouter.get('/create', authenticateToken, authorizeRole('author'), (req, res) => {
     res.render('create_blog', { unsplashAccessKey: process.env.UNSPLASH_ACCESS_KEY || undefined });
 });
 

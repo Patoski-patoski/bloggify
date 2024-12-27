@@ -5,8 +5,8 @@ import cookieParser from 'cookie-parser';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import dotenv from 'dotenv';
-import cors from 'cors';
-import helmet from 'helmet';
+// import cors from 'cors';
+// import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import morgan from "morgan";
 

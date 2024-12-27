@@ -1,10 +1,8 @@
 // services/blogService.js
 import User from '../models/User.js';
 import Blog from '../models/Blog.js';
-import { HTTP_STATUS } from '../../constant.js';
 
 import generateUniqueSlug from '../utils/slugify.js';
-import asyncHandler from 'express-async-handler';
 
 
 // Utility function to create a common error response
@@ -25,7 +23,6 @@ export const validateUserAuthentication = async (req) => {
 export const createBlogPost = async (blogData, user) => {
     try {
         // If no slug is provided, generate a unique one
-        console.log('blogData', blogData);
         if (!blogData.slug) {
             blogData.slug = await generateUniqueSlug(blogData.title);
         }
@@ -34,7 +31,6 @@ export const createBlogPost = async (blogData, user) => {
             ...blogData,
             author: user._id
         });
-        console.log('newBlog', newBlog);
         return newBlog;
 
     } catch (error) {

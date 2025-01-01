@@ -5,7 +5,7 @@ import config from '../../config.js';
 
 const MONGODB_URI = config.mongodb.url || 'mongodb://127.0.0.1/blog';
 
-export async function connectMongoDB() {
+export default async function connectMongoDB() {
     try {
         mongoose.connect(MONGODB_URI, {
             dbName: config.mongodb.dbName

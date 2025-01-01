@@ -3,6 +3,9 @@
 import { generateToken, updateRefreshTokenInDb, setCookies } from '../middleware/authenticate.js'
 import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 import { HTTP_STATUS, SALT_ROUNDS } from '../../constant.js';
 import User from '../models/User.js';
@@ -15,25 +18,36 @@ if (!JWT_SECRET || !REFRESH_JWT_SECRET) {
     process.exit(1);
 }
 
-
+export const tester = asyncHandler(async (req, res) => {
+    return res.status(200).json({ message: 'Hello, world!' });
+});
 // Register user
 export const register = asyncHandler(async (req, res) => {
-    const { username, password, email, bio } = req.body;
+    try {
+        // Your existing code
+        const { username, password, email, bio } = req.body;
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        if (existingUser) {
+            return res.status(HTTP_STATUS.CONFLICT).json({
+                message: 'User with this email or username already exists',
+            });
+        }
 
-    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-    if (existingUser) {
-        return res.status(HTTP_STATUS.CONFLICT).json({
-            message: 'User with this email or username already exists',
+        const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+        const newUser = await User.create({ username, email, bio, password: hashedPassword });
+
+        res.status(HTTP_STATUS.CREATED).json({
+            message: 'User created successfully',
+            user: newUser,
+        });
+    } catch (error) {
+        console.error('Error in register function:', error)
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            message: 'An error occurred while registering the user',
+            error: error.message
         });
     }
-
-    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-    const newUser = await User.create({ username, email, bio, password: hashedPassword });
-
-    res.status(HTTP_STATUS.CREATED).json({
-        message: 'User created successfully',
-        user: newUser,
-    });
+   
 });
 
 

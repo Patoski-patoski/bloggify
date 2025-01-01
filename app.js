@@ -1,7 +1,7 @@
 // app.js
 
-import express from 'express';
 import cookieParser from 'cookie-parser';
+import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import dotenv from 'dotenv';
@@ -15,7 +15,6 @@ import config from './config.js';
 import authRouter from './src/routes/authRoutes.js';
 import blogRouter from './src/routes/blogRoutes.js';
 import profileRouter from './src/routes/profileRoutes.js';
-import { connectMongoDB } from './src/database/database.js';
 import { errorHandler } from './src/middleware/errorHandler.js';
 
 
@@ -26,7 +25,6 @@ const __dirname = dirname(__filename);
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Security middleware
 // app.use(helmet(config.security.helmet));
@@ -54,10 +52,4 @@ app.use( profileRouter);
 app.use(errorHandler);
 
 
-connectMongoDB();
-
-app.listen(PORT, () => {
-    console.log(`Listening live at port ${PORT}`);
-});
-
-export default app
+export default app;

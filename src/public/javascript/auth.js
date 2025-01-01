@@ -23,20 +23,21 @@ async function signupBlog() {
         if (!response.ok) {
             if (response.status === 409) {
                 // Handle existing user error
-                const errorElem = document.querySelector('#email').nextElementSibling;
+                const errorElem = document.getElementById('signup-email').nextElementSibling;
+                console.log(errorElem);
                 errorElem.textContent = data.message;
             } else {
                 throw new Error(data.message || 'Registration failed');
             }
         } else {
             // Successful registration
-            window.location.href = '/login';
+            window.location.href = '/login'; 
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error(' Signup Error:', error);
         const errorMsg = document.getElementById('error-message');
         if (errorMsg) {
-            errorMsg.textContent = error || 'An error occured during login';
+            errorMsg.textContent = error.message || 'An error occured during login';
         }
     }
 }

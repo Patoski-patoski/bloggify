@@ -29,7 +29,6 @@ export const profile = asyncHandler(async (req, res) => {
     ]);
 
     const totalPublishedPages = Math.ceil(countPublishedBlog / limit);
-
     return res.status(HTTP_STATUS.OK).render('profile', {
         user,
         blogs,

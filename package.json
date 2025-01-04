@@ -7,7 +7,7 @@
     "start": "clear ; npx nodemon --env-file=.env server.js",
     "lint": "eslint .",
     "test": "nodemon --experimental-vm-modules --env-file=.env.test node_modules/.bin/jest --detectOpenHandles",
-    "test2": "jest ./src/__tests__/authController.test.js --detectOpenHandles --watchAll"
+    "test2": "nodemon --experimental-vm-modules --env-file=.env.test jest --detectOpenHandles"
   },
   "keywords": [],
   "author": "",

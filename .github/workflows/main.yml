@@ -27,13 +27,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Run the test
-      - name: Run test
-        run: npm test
-
       # Lint code (optional)
       - name: Lint code
         run: npm run lint
-      
-      
-      
+
+        # Run the test
+      - name: Run test
+        run: npm test
+

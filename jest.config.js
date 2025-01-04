@@ -1,3 +1,5 @@
+// jest.config.js
+
 export default {
     transform: {},
     moduleNameMapper: {
@@ -5,4 +7,6 @@ export default {
     },
     testEnvironment: 'node',
     verbose: true,
+    testTimeout: 30000,
+    // setupFilesAfterEnv: ['./setup.js']
 };

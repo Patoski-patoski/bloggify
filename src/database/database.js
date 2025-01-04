@@ -1,7 +1,7 @@
 //database.js
 
 import mongoose from 'mongoose';
-import config from '../../config.js';
+import config from '../../config/config.js';
 
 const MONGODB_URI = config.mongodb.url || 'mongodb://127.0.0.1/blog';
 

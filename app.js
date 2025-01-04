@@ -11,12 +11,11 @@ import rateLimit from 'express-rate-limit';
 import morgan from "morgan";
 
 
-import config from './config.js';
+import config from './config/config.js';
 import authRouter from './src/routes/authRoutes.js';
 import blogRouter from './src/routes/blogRoutes.js';
 import profileRouter from './src/routes/profileRoutes.js';
 import { errorHandler } from './src/middleware/errorHandler.js';
-
 
 
 const __filename = fileURLToPath(import.meta.url);

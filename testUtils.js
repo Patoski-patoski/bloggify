@@ -1,6 +1,6 @@
 // testUtils.js
 import bcrypt from 'bcrypt';
-import { SALT_ROUNDS } from './constant.js';
+import { SALT_ROUNDS } from './config/constant.js';
 import app from "./app.js";
 import User from './src/models/User.js';
 import { setupTestDatabase, closeTestDatabase } from './setup.js';

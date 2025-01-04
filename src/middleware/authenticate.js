@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
 
 import User from '../models/User.js';
-import { HTTP_STATUS } from '../../constant.js';
+import { HTTP_STATUS } from '../../config/constant.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const REFRESH_JWT_SECRET = process.env.REFRESH_JWT_SECRET;

@@ -2,7 +2,7 @@
 
 import Blog from '../models/Blog.js';
 import User from '../models/User.js';
-import { HTTP_STATUS } from '../../constant.js';
+import { HTTP_STATUS } from '../../config/constant.js';
 import generateUniqueSlug from '../utils/slugify.js';
 import asyncHandler from 'express-async-handler';
 import { getBlogsByAuthor, findUserByUsername} from '../services/blogServices.js';

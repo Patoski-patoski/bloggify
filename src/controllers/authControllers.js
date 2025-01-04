@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-import { HTTP_STATUS, SALT_ROUNDS } from '../../constant.js';
+import { HTTP_STATUS, SALT_ROUNDS } from '../../config/constant.js';
 import User from '../models/User.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;

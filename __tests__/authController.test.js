@@ -4,7 +4,7 @@ import request from "supertest";
 
 import { jest, describe, expect, test, beforeAll, beforeEach, afterAll } from '@jest/globals';
 import { startTestServer, closeTestServer, clearUsers, createTestUser } from '../testUtils.js';
-import { HTTP_STATUS } from '../constant.js';
+import { HTTP_STATUS } from '../config/constant.js';
 import app from "../app.js";
 import User from '../src/models/User.js';
 

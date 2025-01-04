@@ -1,5 +1,5 @@
 // middleware/errorHandler.js
-import { HTTP_STATUS } from "../../constant.js";
+import { HTTP_STATUS } from "../../config/constant.js";
 // eslint-disable-next-line no-unused-vars
 export const errorHandler = (err, req, res, next) => {
     console.error('Error Handler', err);

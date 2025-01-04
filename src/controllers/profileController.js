@@ -2,7 +2,8 @@
 import asyncHandler from 'express-async-handler';
 import Blog from '../models/Blog.js';
 import User from '../models/User.js';
-import { HTTP_STATUS } from '../../constant.js';
+import { HTTP_STATUS } from '../../config/constant.js';
+
 
 export const profile = asyncHandler(async (req, res) => {
     const user = await User.findOne({ refreshToken: req.cookies.refreshToken });

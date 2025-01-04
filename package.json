@@ -5,9 +5,10 @@
   "main": "app.js",
   "scripts": {
     "start": "clear ; npx nodemon --env-file=.env server.js",
+    "format:check": "prettier --check .",
+    "test:coverage": "jest --coverage",
     "lint": "eslint .",
     "test": "nodemon --experimental-vm-modules --env-file=.env.test node_modules/.bin/jest --detectOpenHandles"
-
   },
   "keywords": [],
   "author": "",

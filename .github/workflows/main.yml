@@ -1,37 +1,87 @@
-name: CI Pipeline
+name: Bloggify CI/CD Pipeline
 
 on:
   push:
-    branches:
-    - main
+    branches: [ main, develop ]
   pull_request:
-    branches:
-    - main
+    branches: [ main, develop ]
 
 jobs:
   test:
-    runs-on: ubuntu_latest
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd mongosh --eval "db.adminCommand('ping')"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
 
     steps:
-      # Checkout the repository
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      # Set up Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
-          node-version: [18.x, 20.x, 22.x]
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
 
-      # Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: |
+          cd backend
+          npm ci
 
-      # Lint code (optional)
+      - name: Check code formatting
+        run: |
+          cd backend
+          npm run format:check || true
+
       - name: Lint code
-        run: npm run lint
+        run: |
+          cd backend
+          npm run lint || true
 
-        # Run the test
-      - name: Run test
-        run: npm test
+      - name: Run tests
+        run: |
+          cd backend
+          npm test
+        env:
+          CI: true
+          NODE_ENV: test
+          PORT: 3000
+          MONGODB_URI: mongodb://localhost:27017/bloggify_test
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          REFRESH_JWT_SECRET: ${{ secrets.REFRESH_JWT_SECRET }}
 
+      - name: Generate test coverage report
+        run: |
+          cd backend
+          npm run test:coverage
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./backend/coverage
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy to production
+        run: |
+          echo "Add your deployment steps here"
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}

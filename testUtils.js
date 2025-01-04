@@ -1,5 +1,4 @@
 // testUtils.js
-import request from "supertest";
 import bcrypt from 'bcrypt';
 import { SALT_ROUNDS } from './constant.js';
 import app from "./app.js";

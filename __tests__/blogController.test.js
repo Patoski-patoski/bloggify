@@ -1,5 +1,4 @@
 // blogController.test.js
-import bcrypt from 'bcrypt';
 import request from "supertest";
 
 import { jest, describe, expect, test, beforeAll, beforeEach, afterAll } from '@jest/globals';

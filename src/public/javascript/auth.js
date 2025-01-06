@@ -43,7 +43,6 @@ async function signupBlog() {
 }
 
 document.getElementById('signupForm')?.addEventListener('submit', (event) => {
-    alert('Yeahh');
     event.preventDefault();
     signupBlog();
 });

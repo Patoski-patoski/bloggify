@@ -4,11 +4,15 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "clear ; npx nodemon --env-file=.env server.js",
-    "format:check": "prettier --check .",
+    "start": "clear ; npx node --env-file=.env server.js",
     "test:coverage": "jest --coverage",
     "lint": "eslint .",
-    "test": "nodemon --experimental-vm-modules --env-file=.env.test node_modules/.bin/jest --detectOpenHandles"
+    "build": "npm install", // trust proxy (Render)
+    "format:check": "prettier --check .",
+    "test": "jest --detectOpenHandles",
+    "test:coverage": "jest --coverage",
+    // "test:coverage": "node --experimental-vm-modules --env-file=.env.test node_modules/.bin/jest --coverage --detectOpenHandles",
+    // "test": "nodemon --experimental-vm-modules --env-file=.env.test node_modules/.bin/jest --detectOpenHandles"
   },
   "keywords": [],
   "author": "",

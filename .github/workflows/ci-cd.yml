@@ -1,10 +1,10 @@
-name: Bloggify CI/CD Pipeline
+name: Bloggify CI/CD Pipeline@v0
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
@@ -15,11 +15,6 @@ jobs:
         image: mongo
         ports:
           - 27017:27017
-        options: >-
-          --health-cmd mongosh --eval "db.adminCommand('ping')"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
       - uses: actions/checkout@v3
@@ -31,32 +26,28 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          cd backend
-          npm ci
+        run: npm ci
+
+      - name: Wait for MongoDB to start
+        run: sleep 15
 
       - name: Check code formatting
-        run: |
-          cd backend
-          npm run format:check || true
+        run: npm run format:check || true
 
       - name: Lint code
-        run: |
-          cd backend
-          npm run lint || true
+        run: npm run lint || true
 
       - name: Run tests
-        run: |
-          cd backend
-          npm test
+        run: npm test
         env:
           CI: true
           NODE_ENV: test
           PORT: 3000
-          MONGODB_URI: mongodb://localhost:27017/bloggify_test
+          MONGODB_URI: mongodb://localhost:27017/blog
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           REFRESH_JWT_SECRET: ${{ secrets.REFRESH_JWT_SECRET }}
           UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+
 
   deploy:
     needs: test

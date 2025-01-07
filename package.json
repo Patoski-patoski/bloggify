@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "build": "npm install",
     "format:check": "prettier --check .",
-    "test": "nodemon --experimental-vm-modules node_modules/.bin/jest --detectOpenHandles"
+    "test": "jest --experimental-vm-modules --detectOpenHandles"
   },
   "keywords": [],
   "author": "",

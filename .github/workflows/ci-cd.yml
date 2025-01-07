@@ -2,7 +2,7 @@ name: Bloggify CI/CD Pipeline@v0
 
 on:
   push:
-    branches: [main]
+    branches: '*' # Trigger workflow for all branches
   pull_request:
     branches: [main]
 

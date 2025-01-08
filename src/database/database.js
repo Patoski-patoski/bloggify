@@ -3,7 +3,7 @@
 import mongoose from 'mongoose';
 import config from '../../config/config.js';
 
-const MONGODB_URI = config.mongodb.urls || 'mongodb://127.0.0.1/blog';
+const MONGODB_URI = config.mongodb.url || 'mongodb://127.0.0.1/blog';
 
 export default async function connectMongoDB() {
     try {

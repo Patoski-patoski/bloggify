@@ -23,7 +23,7 @@ tinymce.init({
 
             setTimeout(() => { 
                 saveDraftContent(content);
-            }, 5000);
+            }, 15000);
         });
     }
 });

@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "build": "npm install",
     "format:check": "prettier --check .",
-    "test": "node --experimental-vm-modules --env-file=.env node_modules/.bin/jest --detectOpenHandles"
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --detectOpenHandles"
 
   },
   "keywords": [],

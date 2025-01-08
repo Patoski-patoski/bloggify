@@ -12,35 +12,24 @@ export default {
         url: process.env.MONGODB_URI_ATLAS,
         dbName: 'blog',       
     },
-    redis: {
-        username: process.env.REDIS_USERNAME || 'default',
-        url: process.env.REDIS_URL,
-        token: process.env.REDIS_REST_TOKEN,
-        port: process.env.REDIS_PORT || '6379',
-        tls: isProd ? {} : undefined
-    },
+    // redis: {
+    //     username: process.env.REDIS_USERNAME || 'default',
+    //     url: process.env.REDIS_URL,
+    //     token: process.env.REDIS_REST_TOKEN,
+    //     port: process.env.REDIS_PORT || '6379',
+    //     tls: isProd ? {} : undefined
+    // },
     server: {
         port: process.env.PORT || 3000,
         hostname: process.env.HOSTNAME,
         trustProxy: isProd, //Enable behind a reverse proxy (heroku, vercel)
     },
-    // session: {
-    //     secret: getSessionSecret(),
-    //     name: 'sessionId',
-    //     cookie: {
-    //         maxAge: 12 * 60 * 60 * 1000, /* 12 hours */
-    //         secure: isProd,
-    //         httpOnly: true,
-    //         sameSite: isProd ? 'none' : 'lax',
-    //         domain: isProd ? process.env.COOKIE_DOMAIN : undefined,
-    //     },
-    //     rolling: true,
-    // },
+ 
     security: {
         cors: {
             origin: isProd ? process.env.ALLOWED_ORIGINS?.split(',') : '*',
             credentials: true,
-            methods: ['GET', 'POST', 'PUT'],
+            methods: ['GET', 'POST', 'PUT', 'DELETE'],
             exposedHeaders: ['Content-Range'],
             maxAge: 3600
         },

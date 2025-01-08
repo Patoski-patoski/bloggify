@@ -63,7 +63,7 @@ export const login = asyncHandler(async (req, res) => {
     user.lastLogin = new Date();
 
     const accessToken = generateToken(user, JWT_SECRET, '1h');
-    const refreshToken = generateToken(user, REFRESH_JWT_SECRET, '1h');
+    const refreshToken = generateToken(user, REFRESH_JWT_SECRET, '14d');
     await updateRefreshTokenInDb(user, refreshToken);
 
     setCookies(res, {
@@ -91,5 +91,3 @@ export const logout = asyncHandler(async (req, res) => {
 
     res.status(HTTP_STATUS.OK).json({ message: 'Logout successful' });
 });
-
-

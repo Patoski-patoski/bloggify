@@ -67,7 +67,7 @@ export const refreshTokens = asyncHandler(async (req, res, next) => {
 
         if(next) next();
 
-        res.status(HTTP_STATUS.OK).json({ message: 'Tokens refreshed successfully' });
+        res.status(HTTP_STATUS.OK).render('create_blog');
     } catch (error) {
         console.error('RefreshTokens Error', error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Invalid Refresh token' });
@@ -95,7 +95,7 @@ export const setCookies = (res, tokens) => {
     Object.entries(tokens).forEach(([name, { value, maxAge }]) => {
          res.cookie(name, value, {
             maxAge,
-           httpOnly: true,
+            httpOnly: true,
             secure: isProductionEnv,
             sameSite: 'Strict',
         });

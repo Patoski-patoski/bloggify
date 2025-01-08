@@ -21,10 +21,10 @@ if (!JWT_SECRET || !REFRESH_JWT_SECRET) {
 export const tester = asyncHandler(async (req, res) => {
     return res.status(200).json({ message: 'Hello, world!' });
 });
+
 // Register user
 export const register = asyncHandler(async (req, res) => {
     try {
-        // Your existing code
         const { username, password, email, bio } = req.body;
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
         if (existingUser) {
@@ -63,7 +63,7 @@ export const login = asyncHandler(async (req, res) => {
     user.lastLogin = new Date();
 
     const accessToken = generateToken(user, JWT_SECRET, '1h');
-    const refreshToken = generateToken(user, REFRESH_JWT_SECRET, '7d');
+    const refreshToken = generateToken(user, REFRESH_JWT_SECRET, '1h');
     await updateRefreshTokenInDb(user, refreshToken);
 
     setCookies(res, {

@@ -14,34 +14,27 @@ export const authenticateToken = async (req, res, next) => {
     const accessToken = req.cookies.accessToken;
     const refreshToken = req.cookies.refreshToken;
 
-    if (!accessToken) {
-        if (!refreshToken) {
-            return res.status(HTTP_STATUS.FORBIDDEN).json({ message: 'Access token is required' });
-        }
-        await refreshTokens(req, res, next);  // Pass `next` to proceed after refreshing tokens.
-        return;
-    }
+    if (!accessToken) return res.redirect('/login');
 
     try {
         const decoded = jwt.verify(accessToken, JWT_SECRET);
         req.user = decoded;
         res.locals.user = decoded;
-        next();
-    } catch {
-        if (refreshToken) {
-            await refreshTokens(req, res, next); // Try refreshing if accessToken is invalid.
-        } else {
-            res.status(HTTP_STATUS.FORBIDDEN).json({ message: 'Invalid or expired access token' });
-        }
+        return next();
+
+    } catch(err) {
+        return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+            code: HTTP_STATUS.UNAUTHORIZED,
+            message: 'Invalid or expired access token' 
+        });
     }
 };
 
 // Refresh tokens
 export const refreshTokens = asyncHandler(async (req, res, next) => {
     const { refreshToken } = req.cookies;
-    if (!refreshToken) {
-        return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: 'Refresh token required' });
-    }
+
+    if (!refreshToken) return res.redirect('/login');
 
     try {
         const decoded = jwt.verify(refreshToken, REFRESH_JWT_SECRET);
@@ -50,12 +43,10 @@ export const refreshTokens = asyncHandler(async (req, res, next) => {
             refreshTokenExpiresAt: { $gt: new Date() },
         });
 
-        if (!user) {
-            return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: 'Invalid or expired refresh token' });
-        }
+        if (!user) throw new Error();
 
-        const newAccessToken = generateToken(user, JWT_SECRET, '1h');
-        const newRefreshToken = generateToken(user, REFRESH_JWT_SECRET, '7d');
+        const newAccessToken = generateToken(user, JWT_SECRET, '1m');
+        const newRefreshToken = generateToken(user, REFRESH_JWT_SECRET, '3m');
         await updateRefreshTokenInDb(user, newRefreshToken);
 
         setCookies(res, {

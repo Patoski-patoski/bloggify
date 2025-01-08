@@ -65,7 +65,8 @@ export default {
                         "'unsafe-inline'",
                         "https://code.jquery.com",
                         "https://cdn.tiny.cloud/",
-                        "https://stackpath.bootstrapcdn.com/"
+                        "https://stackpath.bootstrapcdn.com/",
+                        "https://cdn.tiny.cloud"
                     ],
                     fontSrc: [
                         "'self'",
@@ -78,6 +79,7 @@ export default {
                         "https://cdn.jsdelivr.net/",
                         "https://fonts.googleapis.com/",
                         "https://cdnjs.cloudflare.com/",
+                        "https://cdn.tiny.cloud",
                         "'unsafe-inline'"
                     ]
                 }

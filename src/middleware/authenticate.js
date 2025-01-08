@@ -1,8 +1,12 @@
 import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
+import dotenv from 'dotenv';
 
+// import Blog from '../models/Blog.js';
 import User from '../models/User.js';
 import { HTTP_STATUS } from '../../config/constant.js';
+
+dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const REFRESH_JWT_SECRET = process.env.REFRESH_JWT_SECRET;
@@ -12,29 +16,38 @@ const isProductionEnv = process.env.NODE_ENV === 'production';
 // Authenticate token middleware
 export const authenticateToken = async (req, res, next) => {
     const accessToken = req.cookies.accessToken;
+    const refreshToken = req.cookies.refreshToken;
 
-    if (!accessToken) return res.redirect('/login');
+    if (!accessToken) {
+        if (!refreshToken) {
+            return res.status(HTTP_STATUS.FORBIDDEN).json({ message: 'Access token is required' });
+        }
+        await refreshTokens(req, res, next);  // Pass `next` to proceed after refreshing tokens.
+        return;
+    }
 
     try {
         const decoded = jwt.verify(accessToken, JWT_SECRET);
         req.user = decoded;
         res.locals.user = decoded;
         return next();
-
-    } catch(err) {
-        console.error(err);
-        return res.status(HTTP_STATUS.UNAUTHORIZED).json({
-            code: HTTP_STATUS.UNAUTHORIZED,
-            message: 'Invalid or expired access token' 
-        });
+    } catch {
+        if (refreshToken) {
+            await refreshTokens(req, res, next); // Try refreshing if accessToken is invalid.
+        } else {
+            res.status(HTTP_STATUS.FORBIDDEN).json({ message: 'Invalid or expired access token' });
+        }
     }
 };
 
 // Refresh tokens
 export const refreshTokens = asyncHandler(async (req, res, next) => {
     const { refreshToken } = req.cookies;
-
-    if (!refreshToken) return res.redirect('/login');
+    if (!refreshToken) {
+        return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+            message: 'Refresh token required'
+        });
+    }
 
     try {
         const decoded = jwt.verify(refreshToken, REFRESH_JWT_SECRET);
@@ -43,10 +56,14 @@ export const refreshTokens = asyncHandler(async (req, res, next) => {
             refreshTokenExpiresAt: { $gt: new Date() },
         });
 
-        if (!user) throw new Error();
+        if (!user) {
+            return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+                message: 'Invalid or expired refresh token'
+            });
+        }
 
-        const newAccessToken = generateToken(user, JWT_SECRET, '1m');
-        const newRefreshToken = generateToken(user, REFRESH_JWT_SECRET, '3m');
+        const newAccessToken = generateToken(user, JWT_SECRET, '1h');
+        const newRefreshToken = generateToken(user, REFRESH_JWT_SECRET, '14d');
         await updateRefreshTokenInDb(user, newRefreshToken);
 
         setCookies(res, {
@@ -55,17 +72,18 @@ export const refreshTokens = asyncHandler(async (req, res, next) => {
         });
 
         req.user = decoded;
-        res.status(HTTP_STATUS.OK).json({ accessToken: newAccessToken });
+
+        if(next) return next();
     } catch (error) {
+        console.error('RefreshTokens Error', error);
         res.redirect('/login');
     }
 });
 
-
 // Helper to generate tokens
 export const generateToken = (user, secret, expiresIn) => {
     const payload = { userId: user.id, role: user.role, email: user.email };
-    if (secret === REFRESH_JWT_SECRET) delete payload.role; // Exclude role for refresh token
+    if (secret === REFRESH_JWT_SECRET) delete payload.role;
     return jwt.sign(payload, secret, { expiresIn });
 };
 

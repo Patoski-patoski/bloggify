@@ -7,6 +7,7 @@ import { HTTP_STATUS } from '../../config/constant.js';
 
 export const profile = asyncHandler(async (req, res) => {
     const user = await User.findOne({ refreshToken: req.cookies.refreshToken });
+    console.log("Prof-controller", req.cookies.refreshToken);
     
     if (!user) {
         return res.status(HTTP_STATUS.NOT_FOUND).redirect('/login');

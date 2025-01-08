@@ -4,6 +4,7 @@
 // eslint-disable-next-line no-undef
 tinymce.init({
     selector: 'textarea',
+    height: 1000,
     plugins: [
         // Core editing features
         'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
@@ -15,18 +16,14 @@ tinymce.init({
         { value: 'First.Name', title: 'First Name' },
         { value: 'Email', title: 'Email' },
     ],
-    ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
     setup: function (editor) {
         // Add change event listener
         editor.on('change', function () {
-            alert('Changed!!!');
             const content = editor.getContent(); // Get the current content
-            console.log('Content changed:', content); // For debugging
 
-            // Call your save function here
             setTimeout(() => { 
                 saveDraftContent(content);
-            }, 15000);
+            }, 5000);
         });
     }
 });
@@ -40,7 +37,8 @@ async function saveDraftContent(content) {
         status: 'draft'
     };
 
-    await saveDraft(formData); // Assuming saveDraft is defined elsewhere
+    if (formData.title)
+        await saveDraft(formData);
 }
 
 // Publish blog function
@@ -78,9 +76,9 @@ async function saveDraft(formData) {
 
         const data = await response.json();
         if (response.ok) {
-            showAlert('Draft saved successfully!', 'warning');
+            if (data.title)
+                showAlert('Draft saved successfully!', 'warning');
         } else {
-            alert(data.message)
             throw new Error(data.message || 'Failed to save draft');
         }
     } catch (error) {
@@ -109,21 +107,28 @@ document.getElementById('save-draft-btn')?.addEventListener('click', async (even
     const draftButton = document.getElementById('save-draft-btn');
     draftButton.ariaDisabled = true;
     draftButton.disabled = true;
+    const title = document.getElementById('title').value;
 
     const formData = {
-        title: document.getElementById('title').value,
+        title,
         subtitle: document.getElementById('subtitle').value,
         image: document.getElementById("imagePreview").src,
         // eslint-disable-next-line no-undef
         content: tinymce.get('content').getContent(),
         status: 'draft'
     };
-    await saveDraft(formData);
 
     setTimeout(() => {
         draftButton.ariaDisabled = false;
         draftButton.disabled = false;
     }, 5000);
+
+    if(title)
+        await saveDraft(formData);
+    else {
+        showAlert('Failed to save to draft: Title not found', 'danger');
+        return;
+    } 
 });
 
 document.getElementById('publish-blog-btn')?.addEventListener('click', async (event) => {
@@ -133,20 +138,27 @@ document.getElementById('publish-blog-btn')?.addEventListener('click', async (ev
     publishButton.ariaDisabled = true;
     publishButton.disabled = true;
 
+    const title = document.getElementById('title').value;
     const formData = {
-        title: document.getElementById('title').value,
+        title,
         subtitle: document.getElementById('subtitle').value,
         // eslint-disable-next-line no-undef
         content: tinymce.get('content').getContent(),
         image: document.getElementById("imagePreview").src,
         status: 'published'
     };
-    await publishBlog(formData);
 
     setTimeout(() => {
         publishButton.ariaDisabled = false;
         publishButton.disabled = false;
     }, 5000);
+
+    if (title)
+        await publishBlog(formData);
+    else{
+        showAlert('Failed to save to draft: Title not found', 'danger');
+        return;
+    }
 });
 
 

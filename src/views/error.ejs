@@ -19,7 +19,7 @@
                     <h2 class="alert-heading"> Oops!! Error <%= statusCode || 404 %></h2>
                     <p><%= message || 'An unexpected error occurred' %></p>
                     <hr>
-                    <a href="<%= href %>" class="btn btn-primary">Go back</a>
+                    <a href="<%= href || undefined %>" class="btn btn-primary">Go back</a>
                 </div>
             </div>
         </div>

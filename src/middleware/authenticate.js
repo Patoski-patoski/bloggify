@@ -12,7 +12,6 @@ const isProductionEnv = process.env.NODE_ENV === 'production';
 // Authenticate token middleware
 export const authenticateToken = async (req, res, next) => {
     const accessToken = req.cookies.accessToken;
-    const refreshToken = req.cookies.refreshToken;
 
     if (!accessToken) return res.redirect('/login');
 
@@ -23,6 +22,7 @@ export const authenticateToken = async (req, res, next) => {
         return next();
 
     } catch(err) {
+        console.error(err);
         return res.status(HTTP_STATUS.UNAUTHORIZED).json({
             code: HTTP_STATUS.UNAUTHORIZED,
             message: 'Invalid or expired access token' 
@@ -55,13 +55,9 @@ export const refreshTokens = asyncHandler(async (req, res, next) => {
         });
 
         req.user = decoded;
-
-        if(next) next();
-
-        res.status(HTTP_STATUS.OK).render('create_blog');
+        res.status(HTTP_STATUS.OK).json({ accessToken: newAccessToken });
     } catch (error) {
-        console.error('RefreshTokens Error', error);
-        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Invalid Refresh token' });
+        res.redirect('/login');
     }
 });
 

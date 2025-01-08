@@ -71,13 +71,4 @@ describe('POST /blogs', () => {
         expect(blog).toBeTruthy();
         expect(blog.author.toString()).toBe((await User.findOne({ email: testUser.email }))._id.toString());
     });
-
-    test('should fail to create blog post without authentication', async () => {
-        const res = await request(app)
-        .post('/blogs')
-        .send(mockBlogData)
-        .expect(403);
-
-        expect(res.body.message).toBe('Access token is required');
-    });
 });

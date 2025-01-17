@@ -42,7 +42,7 @@ blogRouter.post('/blogs', authenticateToken, authorizeRole('author'), postBlog);
 blogRouter.get('/blogs/edit/:slug', authenticateToken, authorizeRole('author'), draftBlog);
 
 // Get published blogs by slug
-blogRouter.get('/blogs/:slug', getPostsBySlug);
+blogRouter.get(`/:username/blogs/:slug`, getPostsBySlug);
 // Get all published blogs 
 blogRouter.get('/all', getAllPublishedBlogs);
 // Update a blog by slug

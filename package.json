@@ -4,13 +4,12 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "clear ; npx node server.js",
+    "start": "clear ; npx nodemon server.js",
     "test:coverage": "jest --coverage",
     "lint": "eslint .",
     "build": "npm install",
     "format:check": "prettier --check .",
     "test": "node --experimental-vm-modules node_modules/.bin/jest --detectOpenHandles"
-
   },
   "keywords": [],
   "author": "",

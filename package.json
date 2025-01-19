@@ -10,7 +10,6 @@
     "build": "npm install",
     "format:check": "prettier --check .",
     "test": "node --experimental-vm-modules node_modules/.bin/jest --detectOpenHandles"
-
   },
   "keywords": [],
   "author": "",

@@ -42,7 +42,7 @@
                                 <small><i class="fa fa-folder"></i> Technology </small>
                                 <small><i class="fa fa-comments"></i> 15 Comments</small>
                             </div>
-                            <a href="/blogs/<%= post.slug %>" class="btn btn-lg btn-outline-light mt-4 mb-4">Read More</a>
+                            <a href="<%= post.author.username %>/blogs/<%= post.slug %>" class="btn btn-lg btn-outline-light mt-4 mb-4">Read More</a>
                         </div>
                     </div>
                 <% }); %>
@@ -66,7 +66,7 @@
                         <div class="card-body">
                             <h5 class="card-title"><%= post.title %></h5>
                             <p class="card-text"><%= post.subtitle || 'No description available.' %></p>
-                            <a href="/blogs/<%= post.slug %>" class="btn btn-primary">Read More</a>
+                            <a href="<%= post.author.username %>/blogs/<%= post.slug %>" class="btn btn-primary">Read More</a>
                         </div>
                     </div>
                 </div>

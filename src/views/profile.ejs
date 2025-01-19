@@ -108,7 +108,7 @@
                                                         year: 'numeric'
                                                     }) %>
                                                 </small>
-                                                <a href="/blogs/<%= blog.slug %>" class="btn btn-sm btn-outline-primary">Read</a>
+                                                <a href="<%= user.username %>/blogs/<%= blog.slug %>" class="btn btn-sm btn-outline-primary">Read</a>
                                             </div>
                                         </div>
                                     </div>
@@ -153,7 +153,7 @@
                                                         }) %>
                                                     </small>
                                                     <div>
-                                                        <a href="/blogs/edit/<%= draft.slug %>" class="btn btn-sm btn-outline-secondary me-2">Edit</a>
+                                                        <a href="<%= user.name %>/blogs/edit/<%= draft.slug %>" class="btn btn-sm btn-outline-secondary me-2">Edit</a>
                                                     </div>
                                                 </div>
                                             </div>

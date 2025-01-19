@@ -84,13 +84,13 @@
                                                     year: 'numeric'
                                                 }) %>
                                             </small>
-                                            <a href="/blogs/<%= blog.slug %>" class="btn btn-sm btn-outline-primary">Read</a>
+                                            <a href="/<%= user.username %>/blogs/<%= blog.slug %>" class="btn btn-sm btn-outline-primary">Read</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         <% }); %>
-                    <h% } else { %>
+                    <% } else { %>
                         <div class="col-12 text-center">
                             <h3 class="text-muted">No published blogs yet.</h3>
                         </div>

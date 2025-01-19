@@ -47,7 +47,7 @@ app.set('view engine', 'ejs');
 app.use( authRouter );
 app.use( blogRouter );
 app.use(profileRouter);
-app.use(docRouter);
+// app.use(docRouter);
 
 // Global middlewares
 app.use(errorHandler);

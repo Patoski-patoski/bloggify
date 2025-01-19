@@ -15,7 +15,7 @@ import config from './config/config.js';
 import authRouter from './src/routes/authRoutes.js';
 import blogRouter from './src/routes/blogRoutes.js';
 import profileRouter from './src/routes/profileRoutes.js';
-import docRouter from './src/routes/docRoutes.js';
+// import docRouter from './src/routes/docRoutes.js';
 import { errorHandler } from './src/middleware/errorHandler.js';
 
 

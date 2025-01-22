@@ -1,188 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= user.username %>'s Profile | Bloggify</title>
-    
+
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:300,400,600,700,800&display=swap" rel="stylesheet">
-    
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:300,400,600,700,800&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
     <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-    
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
     <!-- Local Styles -->
-    <link href="/stylesheets/profile.css" rel="stylesheet">
-</head>
-<body>
+    <link href="/stylesheets/profile.css" rel="stylesheet" />
+  </head>
+  <body>
     <%- include('partials/navbar') %>
 
     <div class="container profile-container mt-5">
-        <div class="row">
-            <!-- Profile Header -->
-            <div class="col-12 text-center mb-5">
-                <img 
-                    src="<%= user.profilePicture || '/img/user.jpg' %>" 
-                    alt="Profile Picture" 
-                    class="rounded-circle profile-avatar mb-3"
-                    width="150" 
-                    height="150"
-                >
-                <h1 class="display-5"><%= user.username %></h1>
-                <p class="text-muted"><%= user.bio || 'Writer & Storyteller' %></p>
-                
-                <!-- Social Links -->
-                <div class="social-links mt-3">
-                    <% if (user.twitter) { %>
-                        <a href="<%= user.twitter || 'none' %>" class="text-dark me-3"><i class="fab fa-twitter"></i></a>
-                    <% } %>
-                    <% if (user.linkedin) { %>
-                        <a href="<%= user.linkedin || 'none' %>" class="text-dark me-3"><i class="fab fa-linkedin"></i></a>
-                    <% } %>
-                    <% if (user.website) { %>
-                        <a href="<%= user.website || 'none' %>" class="text-dark"><i class="fas fa-globe"></i></a>
-                    <% } %>
-                </div>
-            </div>
+      <div class="row">
+        <!-- Profile Header -->
+        <div class="col-12 text-center mb-5">
+          <img
+            src="<%= user.profilePicture || '/img/user.jpg' %>"
+            alt="Profile Picture"
+            class="rounded-circle profile-avatar mb-3"
+            width="150"
+            height="150"
+          />
+          <h1 class="display-5"><%= user.username %></h1>
+          <p class="text-muted"><%= user.bio || 'Writer & Storyteller' %></p>
 
-            <!-- Profile Stats -->
-            <div class="col-12 mb-5">
-                <div class="row text-center">
-                    <div class="col-md-4">
-                        <h4><%= countPublishedBlog || 0 %></h4>
-                        <p class="text-muted">Published Blogs</p>
-                    </div>
-                    <div class="col-md-4">
-                        <h4><%= user.followers || 0 %></h4>
-                        <p class="text-muted">Followers</p>
-                    </div>
-                    <div class="col-md-4">
-                        <h4><%= user.following || 0 %></h4>
-                        <p class="text-muted">Following</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tabs for Blogs, Drafts, etc. -->
-            <div class="col-12">
-                <ul class="nav nav-tabs" id="profileTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="published-tab" data-bs-toggle="tab" data-bs-target="#published" type="button" role="tab">
-                            Published Blogs
-                        </button>
-                    </li>
-                    <% if (locals.user) { %>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="drafts-tab" data-bs-toggle="tab" data-bs-target="#drafts" type="button" role="tab">
-                                Drafts
-                            </button>
-                        </li>
-                    <% } %>
-                </ul>
-
-                <div class="tab-content mt-4" id="profileTabContent">
-                    <!-- Published Blogs Tab -->
-                    <div class="tab-pane fade show active" id="published" role="tabpanel">
-                        <div class="row">
-                            <% blogs.forEach(blog => { %>
-                                <div class="col-md-4 mb-4">
-                                    <div class="card h-100">
-                                        <img 
-                                            src="<%= blog.image || '/img/blog-1.jpg' %>" 
-                                            class="card-img-top" 
-                                            alt="<%= blog.title %>"
-                                        >
-                                        <div class="card-body">
-                                            <h5 class="card-title"><%= blog.title %></h5>
-                                            <p class="card-text text-muted">
-                                                <%= blog.subtitle || 'No subtitle available' %>
-                                            </p>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <small class="text-muted">
-                                                    <%= new Date(blog.createdAt).toLocaleDateString('en-US', {
-                                                        month: 'short', 
-                                                        day: 'numeric', 
-                                                        year: 'numeric'
-                                                    }) %>
-                                                </small>
-                                                <a href="<%= user.username %>/blogs/<%= blog.slug %>" class="btn btn-sm btn-outline-primary">Read</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            <% }); %>
-                        </div>
-
-                        <!-- Pagination for Published Blogs -->
-                        <nav aria-label="Published blogs pagination" class="mt-4">
-                            <ul class="pagination justify-content-center">
-                                <% for (let i = 1; i <= totalPublishedPages; i++) { %>
-                                    <li class="page-item <%= i === currentPublishedPage ? 'active' : '' %>">
-                                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-                                    </li>
-                                <% } %>
-                            </ul>
-                        </nav>
-                    </div>
-
-                    <!-- Drafts Tab (Only visible for own profile) -->
-                    <% if (locals.user) { %>
-                        <div class="tab-pane fade" id="drafts" role="tabpanel">
-                            <div class="row">
-                                <% drafts.forEach(draft => { %>
-                                    <div class="col-md-4 mb-4">
-                                        <div class="card h-100">
-                                            <img 
-                                                src="<%= draft.image || '/img/blog-draft.jpg' %>" 
-                                                class="card-img-top" 
-                                                alt="<%= draft.title %>"
-                                            >
-                                            <div class="card-body">
-                                                <h5 class="card-title"><%= draft.title %></h5>
-                                                <p class="card-text text-muted">Draft</p>
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <small class="text-muted">
-                                                        Last edited: 
-                                                        <%= new Date(draft.updatedAt).toLocaleDateString('en-US', {
-                                                            month: 'short', 
-                                                            day: 'numeric', 
-                                                            year: 'numeric'
-                                                        }) %>
-                                                    </small>
-                                                    <div>
-                                                        <a href="<%= user.name %>/blogs/edit/<%= draft.slug %>" class="btn btn-sm btn-outline-secondary me-2">Edit</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <% }); %>
-                            </div>
-
-                            <!-- Pagination for Drafts -->
-                            <nav aria-label="Drafts pagination" class="mt-4">
-                                <ul class="pagination justify-content-center">
-                                    <% for (let i = 1; i <= drafts; i++) { %>
-                                        <li class="page-item <%= i === currentDraftPage ? 'active' : '' %>">
-                                            <a class="page-link" href="?drafts_page=<%= i %>"><%= i %></a>
-                                        </li>
-                                    <% } %>
-                                </ul>
-                            </nav>
-                        </div>
-                    <% } %>
-                </div>
-            </div>
+          <!-- Social Links -->
+          <div class="social-links mt-3">
+            <% if (user.twitter) { %>
+            <a href="<%= user.twitter || 'none' %>" class="text-dark me-3"
+              ><i class="fab fa-twitter"></i
+            ></a>
+            <% } %> <% if (user.linkedin) { %>
+            <a href="<%= user.linkedin || 'none' %>" class="text-dark me-3"
+              ><i class="fab fa-linkedin"></i
+            ></a>
+            <% } %> <% if (user.website) { %>
+            <a href="<%= user.website || 'none' %>" class="text-dark"
+              ><i class="fas fa-globe"></i
+            ></a>
+            <% } %>
+          </div>
         </div>
+
+        <!-- Profile Stats -->
+        <div class="col-12 mb-5">
+          <div class="row text-center">
+            <div class="col-md-4">
+              <h4><%= countPublishedBlog || 0 %></h4>
+              <p class="text-muted">Published Blogs</p>
+            </div>
+            <div class="col-md-4">
+              <h4><%= user.followers || 0 %></h4>
+              <p class="text-muted">Followers</p>
+            </div>
+            <div class="col-md-4">
+              <h4><%= user.following || 0 %></h4>
+              <p class="text-muted">Following</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs for Blogs, Drafts, etc. -->
+        <div class="col-12">
+          <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link active"
+                id="published-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#published"
+                type="button"
+                role="tab"
+              >
+                Published Blogs
+              </button>
+            </li>
+            <% if (locals.user) { %>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="drafts-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#drafts"
+                type="button"
+                role="tab"
+              >
+                Drafts
+              </button>
+            </li>
+            <% } %>
+          </ul>
+
+          <div class="tab-content mt-4" id="profileTabContent">
+            <!-- Published Blogs Tab -->
+            <div
+              class="tab-pane fade show active"
+              id="published"
+              role="tabpanel"
+            >
+              <div class="row">
+                <% blogs.forEach(blog => { %>
+                <div class="col-md-4 mb-4">
+                  <div class="card h-100">
+                    <img
+                      src="<%= blog.image || '/img/blog-1.jpg' %>"
+                      class="card-img-top"
+                      alt="<%= blog.title %>"
+                    />
+                    <div class="card-body">
+                      <h5 class="card-title"><%= blog.title %></h5>
+                      <p class="card-text text-muted">
+                        <%= blog.subtitle || 'No subtitle available' %>
+                      </p>
+                      <div
+                        class="d-flex justify-content-between align-items-center"
+                      >
+                        <small class="text-muted">
+                          <%= new
+                          Date(blog.createdAt).toLocaleDateString('en-US', {
+                          month: 'short', day: 'numeric', year: 'numeric' }) %>
+                        </small>
+                        <a
+                          href="<%= user.username %>/blogs/<%= blog.slug %>"
+                          class="btn btn-sm btn-outline-primary"
+                          >Read</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <% }); %>
+              </div>
+
+              <!-- Pagination for Published Blogs -->
+              <nav aria-label="Published blogs pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                  <% for (let i = 1; i <= totalPublishedPages; i++) { %>
+                  <li
+                    class="page-item <%= i === currentPublishedPage ? 'active' : '' %>"
+                  >
+                    <a class="page-link" href="?published_page=<%= i %>"
+                      ><%= i %></a
+                    >
+                  </li>
+                  <% } %>
+                </ul>
+              </nav>
+            </div>
+
+            <!-- Drafts Tab (Only visible for own profile) -->
+            <% if (locals.user) { %>
+            <div class="tab-pane fade" id="drafts" role="tabpanel">
+              <div class="row">
+                <% if (drafts.length > 0) { %> <% drafts.forEach(draft => { %>
+                <div class="col-md-4 mb-4">
+                  <div class="card h-100">
+                    <img
+                      src="<%= draft.image || '/img/blog-draft.jpg' %>"
+                      class="card-img-top"
+                      alt="<%= draft.title %>"
+                    />
+                    <div class="card-body">
+                      <h5 class="card-title"><%= draft.title %></h5>
+                      <p class="card-text text-muted">Draft</p>
+                      <div
+                        class="d-flex justify-content-between align-items-center"
+                      >
+                        <small class="text-muted">
+                          Last edited: <%= new
+                          Date(draft.updatedAt).toLocaleDateString('en-US', {
+                          month: 'short', day: 'numeric', year: 'numeric' }) %>
+                        </small>
+                        <div>
+                          <a
+                            href="<%= user.name %>/blogs/edit/<%= draft.slug %>"
+                            class="btn btn-sm btn-outline-secondary me-2"
+                            >Edit</a
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <% }); %> <% } else { %>
+                <div class="col-12 text-center">
+                  <h3 class="text-muted">No drafts yet 😪</h3>
+                </div>
+                <% } %>
+              </div>
+
+              <!-- Pagination for Drafts -->
+              <nav aria-label="Drafts pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                  <% for (let i = 1; i <= drafts; i++) { %>
+                  <li
+                    class="page-item <%= i === currentDraftPage ? 'active' : '' %>"
+                  >
+                    <a class="page-link" href="?drafts_page=<%= i %>"
+                      ><%= i %></a
+                    >
+                  </li>
+                  <% } %>
+                </ul>
+              </nav>
+            </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- Optional: Profile page specific JavaScript -->
     <script src="/javascript/profile.js"></script>
-</body>
+  </body>
 </html>

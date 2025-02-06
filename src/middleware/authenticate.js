@@ -20,7 +20,7 @@ export const authenticateToken = async (req, res, next) => {
 
     if (!accessToken) {
         if (!refreshToken) {
-            return res.status(HTTP_STATUS.FORBIDDEN).json({ message: 'Access token is required' });
+            return res.status(HTTP_STATUS.FORBIDDEN).redirect('/login');
         }
         await refreshTokens(req, res, next);  // Pass `next` to proceed after refreshing tokens.
         return;

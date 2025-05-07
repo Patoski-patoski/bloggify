@@ -1,4 +1,4 @@
-<!-- views/create-blog.ejs -->
+<!-- views/create_blog.ejs -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -25,18 +25,10 @@
     />
 
     <!-- TinyMCE for Rich Text Editing -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script> -->
     <script
       src="https://cdn.tiny.cloud/1/qjghi2uugzibwngdvkyt0bx4p2of9fv7lystm3g1osuy1fcy/tinymce/7/tinymce.min.js"
       referrerpolicy="origin"
     ></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-<!-- <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
-<textarea id="markdown-editor"></textarea>
-<script>
-  var simplemde = new SimpleMDE({ element: document.getElementById("markdown-editor") });
-</script> -->
-
 
     <!-- local CSS & JavaScript-->
     <link href="/stylesheets/create_blog.css" rel="stylesheet" />
@@ -53,7 +45,10 @@
         <div class="card-body p-4">
           <h1 class="mb-4">Create New Article</h1>
 
-          <form id="blogForm" method="POST" >
+          <form id="blogForm">
+            <!-- Hidden field for existingSlug - empty for new posts -->
+            <input type="hidden" id="existingSlug" name="existingSlug" value="">
+            
             <div class="mb-4">
               <label for="title" class="form-label required-field">Title</label>
               <input
@@ -183,14 +178,9 @@
                 <i class="fas fa-save me-2"></i>Save as Draft
               </button>
               <button
-                type="submit"
-                ,
+                type="button"
                 class="btn btn-primary"
                 id="publish-blog-btn"
-                ,
-                aria-busy="false"
-                .
-                aria-disabled="true"
               >
                 <i class="fas fa-paper-plane me-2"></i>Publish
               </button>
@@ -205,7 +195,6 @@
     <script>
       const UNSPLASH_ACCESS_KEY =
         "<%= typeof unsplashAccessKey !== 'undefined' ? unsplashAccessKey : undefined %>";
-      windows.location.reload();
     </script>
 
     <script src="/javascript/blog.js"></script>

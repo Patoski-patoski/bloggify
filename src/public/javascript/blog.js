@@ -21,12 +21,13 @@ tinymce.init({
         editor.on('change', function () {
             const content = editor.getContent(); // Get the current content
 
-            setTimeout(() => { 
+            setTimeout(() => {
                 saveDraftContent(content);
             }, 15000);
         });
     }
 });
+
 // Function to save the draft content
 async function saveDraftContent(content) {
     const formData = {
@@ -34,7 +35,8 @@ async function saveDraftContent(content) {
         subtitle: document.getElementById('subtitle').value,
         image: document.getElementById("imagePreview").src,
         content: content, // Use the updated content
-        status: 'draft'
+        status: 'draft',
+        existingSlug: document.getElementById('existingSlug')?.value || '' // Add the existingSlug if it exists
     };
 
     if (formData.title)
@@ -44,17 +46,21 @@ async function saveDraftContent(content) {
 // Publish blog function
 async function publishBlog(formData) {
     try {
-        const response = await fetch('/blogs', {
-            method: 'POST',
+        const endpoint = formData.existingSlug ? `/blogs/update/${formData.existingSlug}` : '/blogs/publish';
+        console.log("Endpoint", endpoint);
+        const method = formData.existingSlug ? 'PUT' : 'POST';
+
+        const response = await fetch(endpoint, {
+            method: method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
         });
 
         const data = await response.json();
-        if (response.ok) {
+        if (response.ok && data.username) {
             showAlert('Blog published successfully!');
             setTimeout(() => {
-                window.location.href = `/blogs/${data.blog.slug}`;
+                window.location.href = `/${data.username}/blogs/${data.blog.slug}`;
             }, 2000);
         } else {
             throw new Error(data.message || 'Failed to publish blog');
@@ -68,17 +74,27 @@ async function publishBlog(formData) {
 // Save as draft function
 async function saveDraft(formData) {
     try {
-        const response = await fetch('/blogs', {
-            method: 'POST',
+        const endpoint = formData.existingSlug ? `/blogs/update/${formData.existingSlug}` : '/blogs/publish';
+        const method = formData.existingSlug ? 'PUT' : 'POST';
+
+        const response = await fetch(endpoint, {
+            method: method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
         });
 
         const data = await response.json();
         if (response.ok) {
-            if (data.title)
-                showAlert('Draft saved successfully!', 'warning');
+            if (data.blog && data.blog.slug && !formData.existingSlug) {
+                // Update the existingSlug hidden field with the new slug
+                const existingSlugField = document.getElementById('existingSlug');
+                if (existingSlugField) {
+                    existingSlugField.value = data.blog.slug;
+                }
+            }
+            showAlert('Draft saved successfully!', 'warning');
         } else {
+            showAlert('Failed to save draft', 'danger');
             throw new Error(data.message || 'Failed to save draft');
         }
     } catch (error) {
@@ -115,7 +131,8 @@ document.getElementById('save-draft-btn')?.addEventListener('click', async (even
         image: document.getElementById("imagePreview").src,
         // eslint-disable-next-line no-undef
         content: tinymce.get('content').getContent(),
-        status: 'draft'
+        status: 'draft',
+        existingSlug: document.getElementById('existingSlug')?.value || '' // Add the existingSlug if it exists
     };
 
     setTimeout(() => {
@@ -123,12 +140,12 @@ document.getElementById('save-draft-btn')?.addEventListener('click', async (even
         draftButton.disabled = false;
     }, 5000);
 
-    if(title)
+    if (title)
         await saveDraft(formData);
     else {
         showAlert('Failed to save to draft: Title not found', 'danger');
         return;
-    } 
+    }
 });
 
 document.getElementById('publish-blog-btn')?.addEventListener('click', async (event) => {
@@ -145,7 +162,8 @@ document.getElementById('publish-blog-btn')?.addEventListener('click', async (ev
         // eslint-disable-next-line no-undef
         content: tinymce.get('content').getContent(),
         image: document.getElementById("imagePreview").src,
-        status: 'published'
+        status: 'published',
+        existingSlug: document.getElementById('existingSlug')?.value || '' // Add the existingSlug if it exists
     };
 
     setTimeout(() => {
@@ -155,12 +173,27 @@ document.getElementById('publish-blog-btn')?.addEventListener('click', async (ev
 
     if (title)
         await publishBlog(formData);
-    else{
-        showAlert('Failed to save to draft: Title not found', 'danger');
+    else {
+        showAlert('Failed to publish: Title not found', 'danger');
         return;
     }
 });
 
+// Set initial character counts for title and subtitle when page loads
+document.addEventListener('DOMContentLoaded', function () {
+    const titleElement = document.getElementById('title');
+    const subtitleElement = document.getElementById('subtitle');
+
+    if (titleElement) {
+        document.getElementById('titleCount').textContent =
+            `${titleElement.value.length}/200 characters`;
+    }
+
+    if (subtitleElement) {
+        document.getElementById('subtitleCount').textContent =
+            `${subtitleElement.value.length}/500 characters`;
+    }
+});
 
 // Character count for title and subtitle
 document.getElementById('title')?.addEventListener('input', function () {
@@ -172,7 +205,6 @@ document.getElementById('subtitle')?.addEventListener('input', function () {
     document.getElementById('subtitleCount').textContent =
         `${this.value.length}/500 characters`;
 });
-
 
 function previewImage(event) {
     const imagePreview = document.getElementById("imagePreview");
@@ -188,11 +220,12 @@ function previewImage(event) {
         imagePreview.style.display = "none"; // Hide the image if no file is selected
     }
 }
+
 document.getElementById('image')?.addEventListener('change', (event) => {
-    alert('Changed');
     previewImage(event);
 });
-document.getElementById("unsplashSearch").addEventListener(
+
+document.getElementById("unsplashSearch")?.addEventListener(
     "input", async function () {
         const query = this.value;
         const gallery = document.getElementById("unsplashGallery");
@@ -207,8 +240,6 @@ document.getElementById("unsplashSearch").addEventListener(
                 const imgElement = document.createElement("img");
                 imgElement.src = image.urls.small;
 
-                // to get an array of unsplash images, get from imgElement.src and store in an array
-                // console.log("img element", imgElement.src);
                 imgElement.alt = image.description || "Unsplash Image";
                 imgElement.className = "img-thumbnail";
                 imgElement.style.cursor = "pointer";
@@ -223,13 +254,11 @@ document.getElementById("unsplashSearch").addEventListener(
 function selectUnsplashImage(imageUrl) {
     const imagePreview = document.getElementById("imagePreview");
     imagePreview.src = imageUrl;
-    console.log('imagePreview.src', imagePreview.src);
     imagePreview.style.display = "block";
 
     // Close modal
     const unsplashModal = document.getElementById("unsplashModal");
     // eslint-disable-next-line no-undef
     const modalInstance = bootstrap.Modal.getInstance(unsplashModal);
-    console.log(modalInstance);
     modalInstance.hide();
 }

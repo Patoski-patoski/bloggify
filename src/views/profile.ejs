@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -152,7 +152,7 @@
                           </button>
                           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
                             <li><a class="dropdown-item" href="/blogs/edit/<%= blog.slug %>"><i class="fas fa-edit me-2"></i>Edit</a></li>
-                            <li><a class="dropdown-item text-danger blog-delete" href="#" data-slug="<%= blog.slug %>"><i class="fas fa-trash me-2"></i>Delete</a></li>
+                            <li><a class="dropdown-item text-danger blog-delete" href="/blogs/<%= blog.slug %>" data-slug="<%= blog.slug %>"><i class="fas fa-trash me-2"></i>Delete</a></li>
                           </ul>
                         </div>
                       </div>
@@ -283,10 +283,10 @@
               </div>
 
               <!-- Pagination for Drafts -->
-              <% if (drafts && drafts.length > 0 && totalDraftPages > 1) { %>
+              <% if (drafts && drafts.length > 0) { %>
               <nav aria-label="Drafts pagination" class="mt-4">
                 <ul class="pagination justify-content-center">
-                  <% for (let i = 1; i <= totalDraftPages; i++) { %>
+                  <% for (let i = 1; i <= drafts; i++) { %>
                   <li
                     class="page-item <%= i === currentDraftPage ? 'active' : '' %>"
                   >
@@ -327,72 +327,4 @@
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-        // For blog deletion
-        let blogToDelete = null;
-        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        
-        // Set up event listeners for delete buttons
-        document.querySelectorAll('.blog-delete').forEach(button => {
-          button.addEventListener('click', function(e) {
-            e.preventDefault();
-            blogToDelete = this.dataset.slug;
-            deleteModal.show();
-          });
-        });
-        
-        // Set up confirmation button
-        document.getElementById('confirmDelete').addEventListener('click', function() {
-          if (blogToDelete) {
-            // Call the delete API
-            fetch(`/api/blogs/${blogToDelete}`, {
-              method: 'DELETE',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              credentials: 'same-origin'
-            })
-            .then(response => response.json())
-            .then(data => {
-              if (data.message === 'Blog deleted') {
-                // Remove the blog card from the DOM
-                const element = document.querySelector(`[data-slug="${blogToDelete}"]`).closest('.col-md-4');
-                element.remove();
-                
-                // Show success message
-                showAlert('Blog successfully deleted', 'success');
-              } else {
-                showAlert('Error deleting blog', 'danger');
-              }
-              deleteModal.hide();
-            })
-            .catch(error => {
-              console.error('Error:', error);
-              showAlert('Error deleting blog', 'danger');
-              deleteModal.hide();
-            });
-          }
-        });
-        
-        // Function to show alerts
-        function showAlert(message, type) {
-          const alertDiv = document.createElement('div');
-          alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-          alertDiv.role = 'alert';
-          alertDiv.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          `;
-          
-          // Insert after the header section
-          const container = document.querySelector('.profile-container');
-          container.insertBefore(alertDiv, container.firstChild);
-          
-          // Auto-dismiss after 5 seconds
-          setTimeout(() => {
-            alertDiv.classList.remove('show');
-            setTimeout(() => alertDiv.remove(), 300);
-          }, 5000);
-        }
-      });
-    </script>
+      

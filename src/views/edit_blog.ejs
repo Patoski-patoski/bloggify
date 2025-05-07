@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Create New Article - Bloggify</title>
+    <title>Edit Article - Bloggify</title>
 
     <!-- Google Fonts -->
     <link
@@ -25,7 +25,6 @@
     />
 
     <!-- TinyMCE for Rich Text Editing -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script> -->
     <script
       src="https://cdn.tiny.cloud/1/qjghi2uugzibwngdvkyt0bx4p2of9fv7lystm3g1osuy1fcy/tinymce/7/tinymce.min.js"
       referrerpolicy="origin"
@@ -44,9 +43,12 @@
     <div class="container editor-container">
       <div class="card shadow-sm">
         <div class="card-body p-4">
-          <h1 class="mb-4">Create New Article</h1>
+          <h1 class="mb-4">Edit Article</h1>
 
-          <form id="blogForm"  action="/blogs" method="POST" enctype="multipart/form-data"></form>
+          <form id="blogForm">
+            <!-- Hidden field to store the existing slug -->
+            <input type="hidden" id="existingSlug" name="existingSlug" value="<%= slug %>">
+            
             <div class="mb-4">
               <label for="title" class="form-label required-field">Title</label>
               <input
@@ -71,12 +73,13 @@
                 id="subtitle"
                 name="subtitle"
                 maxlength="500"
-                value="<%= subtitle || 'Enter a brief subtitle (optional)'%>"
+                value="<%= subtitle || '' %>"
               />
               <div class="word-count mt-1" id="subtitleCount">
                 0/500 characters
               </div>
             </div>
+            
             <div class="mb-4">
               <label for="image" class="form-label">Featured Image</label>
               <div class="d-flex gap-3">
@@ -163,24 +166,17 @@
               <label for="content" class="form-label required-field">
                 Content
               </label>
-              <textarea id="content" name="content" required minlength="20">
-                <%- content %></textarea
-              >
+              <textarea id="content" name="content" required minlength="20"><%- content %></textarea>
             </div>
 
             <div class="d-flex justify-content-end gap-3">
-              <button type="submit" class="btn btn-save" id="save-draft-btn">
+              <button type="button" class="btn btn-save" id="save-draft-btn">
                 <i class="fas fa-save me-2"></i>Save as Draft
               </button>
               <button
-                type="submit"
-                ,
+                type="button"
                 class="btn btn-primary"
                 id="publish-blog-btn"
-                ,
-                aria-busy="false"
-                .
-                aria-disabled="true"
               >
                 <i class="fas fa-paper-plane me-2"></i>Publish
               </button>

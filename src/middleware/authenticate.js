@@ -1,3 +1,5 @@
+//src/middleware/authenticate.js
+
 import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
 import dotenv from 'dotenv';
@@ -51,6 +53,7 @@ export const refreshTokens = asyncHandler(async (req, res, next) => {
 
     try {
         const decoded = jwt.verify(refreshToken, REFRESH_JWT_SECRET);
+        console.log("Decoded", decoded);
         const user = await User.findOne({
             refreshToken,
             refreshTokenExpiresAt: { $gt: new Date() },
@@ -62,13 +65,22 @@ export const refreshTokens = asyncHandler(async (req, res, next) => {
             });
         }
 
+        const isLongTermSession = user.longTermSession || false; // Check if the user has a long-term session
+
+        // Set token expirations based on original "Remember Me" choice
+        const refreshTokenExpiry = isLongTermSession ? '30d' : '1d';
+        const refreshTokenCookieMaxAge = isLongTermSession
+            ? 30 * 24 * 3600 * 1000  // 30 days
+            : 24 * 3600 * 1000;      // 1 day
+
         const newAccessToken = generateToken(user, JWT_SECRET, '1h');
-        const newRefreshToken = generateToken(user, REFRESH_JWT_SECRET, '14d');
-        await updateRefreshTokenInDb(user, newRefreshToken);
+        const newRefreshToken = generateToken(user, REFRESH_JWT_SECRET, refreshTokenExpiry);
+
+        await updateRefreshTokenInDb(user, newRefreshToken, isLongTermSession);
 
         setCookies(res, {
             accessToken: { value: newAccessToken, maxAge: 3600 * 1000 },
-            refreshToken: { value: newRefreshToken, maxAge: 7 * 24 * 3600 * 1000 },
+            refreshToken: { value: newRefreshToken, refreshTokenCookieMaxAge }
         });
 
         req.user = decoded;
@@ -88,9 +100,13 @@ export const generateToken = (user, secret, expiresIn) => {
 };
 
 // Helper to handle token updates
-export const updateRefreshTokenInDb = async (user, refreshToken) => {
+export const updateRefreshTokenInDb = async (user, refreshToken, rememberMe = false) => {
     user.refreshToken = refreshToken;
-    user.refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    const expiryDays = rememberMe ? 30 : 1; // 30 days if rememberMe is true, otherwise 1 day
+    user.refreshTokenExpiresAt = new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000); // Set expiration date
+
+    user.longTermSession = rememberMe; // Store rememberMe status in the user document
     await user.save();
 };
 

@@ -60,6 +60,10 @@ const userSchema = new Schema({
     },
     refreshTokenExpiresAt: {
         type: Date
+    },
+    longTermSession: {
+        type: Boolean,
+        default: false
     }
 });
 

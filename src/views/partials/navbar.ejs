@@ -15,7 +15,7 @@
                         <a style="color: #9198a1" class="nav-link" href="/profile">Profile</a>
                     </li>
                     <li class="nav-item">
-                        <a style="color: #9198a1" class="nav-link" href="/logout">Logout</a>
+                        <a style="color: #9198a1" class="nav-link" href="/logout">Logout <%= locals.user.name %></a>
                     </li>
                 <% } else { %>
                     <li class="nav-item">

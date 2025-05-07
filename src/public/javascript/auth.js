@@ -56,6 +56,7 @@ async function loginBlog() {
    const formData = { 
      email: document.getElementById('login-email').value,
      password: document.getElementById('login-password').value,
+     rememberMe: document.getElementById('remember-me').checked
    }
 
     try {

@@ -53,7 +53,7 @@ export const register = asyncHandler(async (req, res) => {
 
 // Login user
 export const login = asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
 
     const user = await User.findOne({ email }).select('+password');
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -62,13 +62,25 @@ export const login = asyncHandler(async (req, res) => {
 
     user.lastLogin = new Date();
 
-    const accessToken = generateToken(user, JWT_SECRET, '1h');
-    const refreshToken = generateToken(user, REFRESH_JWT_SECRET, '14d');
-    await updateRefreshTokenInDb(user, refreshToken);
+    // Set refreshToken expiration
+    const accessTokenExpiry = '1h'; //Keep access token short-lived
+    const refreshTokenExpiry = rememberMe
+        ? '30d' // 30 days 
+        : '1d'; // 1 day
+    
+    const refreshTokenCookieMaxAge = rememberMe
+        ? 30 * 24 * 3600 * 1000 // 30 days
+        : 24 * 3600 * 1000; // 1 day
+    
+    
+    const accessToken = generateToken(user, JWT_SECRET, accessTokenExpiry);
+    const refreshToken = generateToken(user, REFRESH_JWT_SECRET, refreshTokenExpiry);
+    
+    await updateRefreshTokenInDb(user, refreshToken, rememberMe);
 
     setCookies(res, {
         accessToken: { value: accessToken, maxAge: 3600 * 1000 }, // 1 hour
-        refreshToken: { value: refreshToken, maxAge: 7 * 24 * 3600 * 1000 }, // 7 days
+        refreshToken: { value: refreshToken, maxAge: refreshTokenCookieMaxAge }, // 1 day
     });
 
     res.status(HTTP_STATUS.OK).json({

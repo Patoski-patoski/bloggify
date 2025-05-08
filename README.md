@@ -6,14 +6,14 @@ Bloggify is a full-stack blogging application that allows users to create, manag
 
 - **User Authentication**: Secure login and registration using JSON Web Tokens (JWT).
 - **CRUD Operations**: Create, Read, Update, and Delete blog posts with ease.
-- **Slug-based URLs**: Access blog posts via user-friendly slugs.
-- **User Management**: Each user can manage their own blog posts.
+- **Slug-based URLS**: Access blog posts via user-friendly slugs.
+- **User Management**: Users can manage their blog posts.
 
 ## Technology Stack
 
 - **Frontend**: HTML, CSS, Bootstrap, JavaScript
 - **Backend**: Node.js with Express.js
-- **Database**: MongoDB, accessed through Mongoose
+- **Database**: Mongodb, accessed through Mongoose
 - **Authentication**: JSON Web Tokens (JWT)
 
 ## Installation
@@ -75,4 +75,4 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 ## Contact
 
-For any inquiries, please reach out to [patrickpeters911@mail.com](mailto:patrickpeters911@gmail.com).
+For any inquiries, please contact [patrickpeters911@gmail.com](mailto:patrickpeters911@gmail.com).

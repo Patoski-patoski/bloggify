@@ -25,6 +25,12 @@ dotenv.config();
 
 const app = express();
 
+app.get("/health", (req, res) => {
+  return res.status(200).json(
+    {"Health": "OK", "status": 200}
+  )
+});
+
 // Security middleware
 // app.use(helmet(config.security.helmet));
 // app.use(cors(config.security.cors));

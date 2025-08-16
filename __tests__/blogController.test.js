@@ -33,7 +33,7 @@ describe('POST /blogs', () => {
     const mockBlogData = {
         title: 'Test Blog',
         subtitle: 'Test Subtitle',
-        content: 'Test Content',
+        content: 'This is a test blog post with enough content to pass validation',
         status: 'published',
         image: 'test-image.jpg'
     };
@@ -53,7 +53,7 @@ describe('POST /blogs', () => {
         
         // Create blog post using cookies from login
         const blogResponse = await request(app)
-            .post('/blogs')
+            .post('/blogs/publish')
             .set('Cookie', cookies)
             .send(mockBlogData)
             .expect(201);

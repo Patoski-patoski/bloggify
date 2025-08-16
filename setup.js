@@ -6,7 +6,7 @@ let mongoServer;
 
 export const setupTestDatabase = async () => {
   mongoServer = await MongoMemoryServer.create({
-    instance: { launchTimeout: 20000 }
+    instance: { launchTimeout: 30000 }
   });
 
   const uri = mongoServer.getUri();

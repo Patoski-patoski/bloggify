@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 const isProd = process.env.NODE_ENV === 'production';
 
-if (isProd) {
+if (!isProd) { 
     dotenv.config();
 }
 
@@ -12,13 +12,7 @@ export default {
         url: process.env.MONGODB_URI_ATLAS,
         dbName: 'blog',       
     },
-    // redis: {
-    //     username: process.env.REDIS_USERNAME || 'default',
-    //     url: process.env.REDIS_URL,
-    //     token: process.env.REDIS_REST_TOKEN,
-    //     port: process.env.REDIS_PORT || '6379',
-    //     tls: isProd ? {} : undefined
-    // },
+
     server: {
         port: process.env.PORT || 3000,
         hostname: process.env.HOSTNAME,

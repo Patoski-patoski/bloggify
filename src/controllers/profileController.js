@@ -16,7 +16,7 @@ export const profile = asyncHandler(async (req, res) => {
     const draftsPage = parseInt(req.query.drafts_page) || 1;
     const limit = 6; // blogs per page
 
-    const [blogs, drafts, countPublishedBlog] = await Promise.all([
+    const [blogs, drafts, countPublishedBlog, countDraftBlog] = await Promise.all([
         Blog.find({ author: user._id, status: 'published' })
             .skip((page - 1) * limit)
             .limit(limit)
@@ -25,10 +25,12 @@ export const profile = asyncHandler(async (req, res) => {
             .skip((draftsPage - 1) * limit)
             .limit(limit)
             .sort({ updatedAt: -1 }),
-        Blog.countDocuments({author: user._id, status: 'published' })
+        Blog.countDocuments({author: user._id, status: 'published' }),
+        Blog.countDocuments({author: user._id, status: 'draft' })
     ]);
 
     const totalPublishedPages = Math.ceil(countPublishedBlog / limit);
+    const totalDraftPages = Math.ceil(countDraftBlog / limit);
     return res.status(HTTP_STATUS.OK).render('profile', {
         user,
         blogs,
@@ -36,6 +38,7 @@ export const profile = asyncHandler(async (req, res) => {
         countPublishedBlog,
         currentPublishedPage: page,
         totalPublishedPages,
-        currentDraftPage: draftsPage
+        currentDraftPage: draftsPage,
+        totalDraftPages
     });
 });

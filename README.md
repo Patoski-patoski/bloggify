@@ -75,4 +75,4 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 ## Contact
 
-For any inquiries, please reach out to [patrickpeters911@mail.com](mailto:patrickpeters911@gmail.com).
+For any inquiries, please reach out to [patrickpeters911@gmail.com](mailto:patrickpeters911@gmail.com).

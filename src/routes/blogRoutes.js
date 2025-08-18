@@ -58,12 +58,17 @@ blogRouter.get('/all', getAllPublishedBlogs);
 blogRouter.put('/blogs/update/:slug', authenticateToken, authorizeRole('author'), updateBlog);
 
 // DELETE a blog by slug
-blogRouter.delete('blogs/:slug', authenticateToken, authorizeRole('author'), deleteBlog);
+blogRouter.delete('/blogs/:slug', authenticateToken, authorizeRole('author'), deleteBlog); 
 
 blogRouter.get('/create', authenticateToken, authorizeRole('author'), (req, res) => {
     res.render('create_blog', { unsplashAccessKey: process.env.UNSPLASH_ACCESS_KEY || undefined });
 });
 
+// DELETE route for deleting blogs
+// blogRouter.delete('/:slug', authenticateToken, deleteBlog);
+
+// PUT route for updating blogs (including publishing drafts)
+blogRouter.put('/update/:slug', authenticateToken, authorizeRole('author'),updateBlog);
 
 // Get published blogs by author name
 blogRouter.get('/author/:username', getPostsByAuthor);

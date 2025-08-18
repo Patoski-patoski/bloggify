@@ -83,7 +83,7 @@ async function loginBlog() {
             }
         } else {
             // Successful login
-            window.location.href = '/create';
+            window.location.href = '/profile';
         }
     } catch (error) {
         console.error('Error:', error);

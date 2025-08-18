@@ -165,7 +165,7 @@ export const updateBlog = asyncHandler(async (req, res) => {
     });
 });
 
-// The rest of the controllers remain the same...
+
 export const getPostsBySlug = asyncHandler(async (req, res) => {
     const { slug } = req.params;
 
@@ -247,20 +247,39 @@ export const getPostsByAuthor = asyncHandler(async (req, res) => {
     });
 });
 
+// Delete blog
 export const deleteBlog = asyncHandler(async (req, res) => {
-    const { slug } = req.params;
+    try {
+        const { slug } = req.params;
+        const userId = req.user.userId;
 
-    const user = await User.findOne({ id: req.user.userId });
-    if (!user) return res.status(HTTP_STATUS.UNAUTHORIZED).json({
-        message: "Authentication failed"
-    });
+        console.log('Attempting to delete blog with slug:', slug);
+        console.log('User ID:', userId);
 
-    const blog = await Blog.findOneAndDelete({ slug, author: user._id });
-    if (!blog) return res.status(HTTP_STATUS.NOT_FOUND).json({
-        message: "Blog not found or not authorized"
-    });
+        // Find the blog by slug and ensure it belongs to the authenticated user
+        const blog = await Blog.findOne({ slug, author: userId });
 
-    return res.status(HTTP_STATUS.OK).json({ message: 'Blog deleted' });
+        if (!blog) {
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                message: 'Blog not found or you do not have permission to delete it'
+            });
+        }
+
+        // Delete the blog
+        await Blog.findByIdAndDelete(blog._id);
+
+        res.status(HTTP_STATUS.OK).json({
+            message: 'Blog deleted successfully',
+            deletedSlug: slug
+        });
+
+    } catch (error) {
+        console.error('Error in deleteBlog:', error);
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            message: 'An error occurred while deleting the blog',
+            error: error.message
+        });
+    }
 });
 
 export const getBlogs = async (req, res) => {

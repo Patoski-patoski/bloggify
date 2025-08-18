@@ -1,4 +1,4 @@
-// controllers/blogControllers.js (fixed version)
+// controllers/blogControllers.js 
 
 import Blog from '../models/Blog.js';
 import User from '../models/User.js';
@@ -7,50 +7,23 @@ import generateUniqueSlug from '../utils/slugify.js';
 import asyncHandler from 'express-async-handler';
 import { getBlogsByAuthor, findUserByUsername } from '../services/blogServices.js';
 
-// POST a new blog
+// POST a new blog (publish)
 export const postBlog = asyncHandler(async (req, res) => {
-    const { title, subtitle, content, status, image, existingSlug } = req.body;
+    const { title, subtitle, content, image } = req.body;
 
     const user = await User.findOne({ id: req.user.userId });
-    if (!user) return res.status(HTTP_STATUS.UNAUTHORIZED).json(
-        { message: "Authentication failed. Please check your credentials." });
+    if (!user) {
+        return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: "Authentication failed. Please check your credentials." });
+    }
 
     try {
-        // Check if we're updating an existing blog
-        if (existingSlug) {
-            // Find the existing blog
-            const existingBlog = await Blog.findOne({ slug: existingSlug, author: user._id });
-
-            if (existingBlog) {
-                // Update existing blog
-                const updatedBlog = await Blog.findOneAndUpdate(
-                    { slug: existingSlug, author: user._id },
-                    {
-                        title,
-                        subtitle,
-                        content,
-                        status,
-                        updatedAt: new Date(),
-                        image
-                    },
-                    { new: true }
-                );
-
-                return res.status(HTTP_STATUS.OK).json({
-                    message: "Blog post updated",
-                    blog: updatedBlog
-                });
-            }
-        }
-
-        // Create a new blog
         const slug = await generateUniqueSlug(title);
 
         const newBlog = await Blog.create({
             title,
             subtitle,
             content,
-            status,
+            status: 'published', // Always published
             slug,
             image,
             author: user._id,
@@ -60,7 +33,6 @@ export const postBlog = asyncHandler(async (req, res) => {
 
         const author = await User.findOne({ _id: newBlog.author });
         const username = author.username;
-
 
         return res.status(HTTP_STATUS.CREATED).json({
             message: "Blog post created",
@@ -75,6 +47,44 @@ export const postBlog = asyncHandler(async (req, res) => {
         });
     }
 });
+
+// POST a new draft
+export const createDraft = asyncHandler(async (req, res) => {
+    const { title, subtitle, content, image } = req.body;
+
+    const user = await User.findOne({ id: req.user.userId });
+    if (!user) {
+        return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: "Authentication failed. Please check your credentials." });
+    }
+
+    try {
+        const slug = await generateUniqueSlug(title);
+
+        const newDraft = await Blog.create({
+            title,
+            subtitle,
+            content,
+            status: 'draft', // Always draft
+            slug,
+            image,
+            author: user._id,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        });
+
+        return res.status(HTTP_STATUS.CREATED).json({
+            message: "Draft created",
+            blog: newDraft
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+            message: error.message
+        });
+    }
+});
+
 
 // Open a draft for editing
 export const draftBlog = asyncHandler(async (req, res) => {

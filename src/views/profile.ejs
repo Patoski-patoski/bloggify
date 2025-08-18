@@ -327,4 +327,75 @@
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+      let blogSlugToDelete = null; // Variable to store the slug of the blog to be deleted
+
+      // Event listener for all delete buttons
+      document.querySelectorAll('.blog-delete').forEach(button => {
+        button.addEventListener('click', function(event) {
+          event.preventDefault();
+          blogSlugToDelete = this.dataset.slug; // Get the slug from the data-slug attribute
+          const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+          deleteModal.show();
+        });
+      });
+
+      // Event listener for the confirm delete button inside the modal
+      document.getElementById('confirmDelete').addEventListener('click', async function() {
+        if (blogSlugToDelete) {
+          try {
+            const response = await fetch(`/blogs/${blogSlugToDelete}`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              showAlert('Blog deleted successfully!', 'success');
+              // Remove the blog card from the DOM
+              const deletedCard = document.querySelector(`[data-slug="${blogSlugToDelete}"]`).closest('.blog-card');
+              if (deletedCard) {
+                deletedCard.remove();
+              }
+              // Hide the modal
+              const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+              deleteModal.hide();
+            } else {
+              showAlert(data.message || 'Failed to delete blog', 'danger');
+            }
+          } catch (error) {
+            console.error('Error deleting blog:', error);
+            showAlert('An error occurred while deleting the blog.', 'danger');
+          }
+        }
+      });
+
+      // Function to show alerts (similar to the one in blog.js)
+      function showAlert(message, type = 'success') {
+        const alertContainer = document.getElementById('alert-container');
+        // Create alert container if it doesn't exist
+        if (!alertContainer) {
+            const body = document.querySelector('body');
+            const newAlertContainer = document.createElement('div');
+            newAlertContainer.id = 'alert-container';
+            newAlertContainer.style.position = 'fixed';
+            newAlertContainer.style.top = '10px';
+            newAlertContainer.style.right = '10px';
+            newAlertContainer.style.zIndex = '1050';
+            body.prepend(newAlertContainer);
+        }
+
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
+        alert.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`;
+        document.getElementById('alert-container').append(alert);
+
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+          alert.remove();
+        }, 5000);
+      }
+    </script>
       

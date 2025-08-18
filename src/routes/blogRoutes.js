@@ -11,7 +11,8 @@ import {
     getBlogs,
     getPostsByAuthor,
     getPostsBySlug,
-    updateBlog
+    updateBlog,
+    createDraft
 } from '../controllers/blogControllers.js';
 
 
@@ -40,6 +41,9 @@ blogRouter.get('/blogs', getBlogs);
 
 // POST a blog
 blogRouter.post('/blogs/publish', authenticateToken, authorizeRole('author'), postBlog);
+
+// POST a draft
+blogRouter.post('/blogs/draft', authenticateToken, authorizeRole('author'), createDraft);
 
 // opne draft for editing by slug
 blogRouter.get('/blogs/edit/:slug', authenticateToken, authorizeRole('author'), draftBlog);

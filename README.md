@@ -76,3 +76,29 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 ## Contact
 
 For any inquiries, please reach out to [patrickpeters911@gmail.com](mailto:patrickpeters911@gmail.com).
+
+## File structure
+
+```bash
+your-project/
+├── public/                      # All static assets go here
+│   ├── stylesheets/             # CSS files
+│   │   └── profile.css          # Your profile CSS
+│   ├── javascript/              # JavaScript files 
+│   │   └── profile.js           # Your profile JavaScript
+│   ├── img/                     # Images
+│   │   ├── user.jpg             # Default user image
+│   │   ├── blog-1.jpg           # Blog thumbnail
+│   │   └── blog-draft.jpg       # Draft thumbnail
+│   └── other-static-assets/     # Other assets
+├── views/                       # Your EJS templates
+│   ├── partials/                # Reusable template parts
+│   │   └── navbar.ejs           # Navigation bar partial
+│   └── profile.ejs              # Your profile view
+├── src/                         # Application source code
+│   ├── controllers/             # Controller functions
+│   ├── middleware/              # Middlewares like authentication
+│   └── models/                  # Database models
+├── app.js or index.js           # Main application file
+└── package.json                 # Project dependencies
+```

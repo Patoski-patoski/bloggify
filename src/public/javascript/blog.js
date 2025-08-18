@@ -47,7 +47,6 @@ async function saveDraftContent(content) {
 async function publishBlog(formData) {
     try {
         const endpoint = formData.existingSlug ? `/blogs/update/${formData.existingSlug}` : '/blogs/publish';
-        console.log("Endpoint", endpoint);
         const method = formData.existingSlug ? 'PUT' : 'POST';
 
         const response = await fetch(endpoint, {
@@ -74,7 +73,7 @@ async function publishBlog(formData) {
 // Save as draft function
 async function saveDraft(formData) {
     try {
-        const endpoint = formData.existingSlug ? `/blogs/update/${formData.existingSlug}` : '/blogs/publish';
+        const endpoint = formData.existingSlug ? `/blogs/update/${formData.existingSlug}` : '/blogs/draft';
         const method = formData.existingSlug ? 'PUT' : 'POST';
 
         const response = await fetch(endpoint, {

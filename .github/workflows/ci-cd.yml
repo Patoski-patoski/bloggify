@@ -1,3 +1,9 @@
+# The workflow triggers on pushes to any branch and pull requests to main. The test job runs on all pushes,
+# but the deploy job only runs on a successful test job from a push to main. Therefore, when you push to 
+# a new branch, only the test job will execute. The pipeline will not automatically merge to main; you
+# must do that manually via a pull request. Merging a pull request to main will then trigger the deploy job.
+
+
 name: Bloggify CI/CD Pipeline@v0
 
 on:

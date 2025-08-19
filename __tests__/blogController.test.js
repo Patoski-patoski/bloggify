@@ -72,3 +72,138 @@ describe('POST /blogs', () => {
         expect(blog.author.toString()).toBe((await User.findOne({ email: testUser.email }))._id.toString());
     });
 });
+
+describe('PUT /blogs/update/:slug', () => {
+    const testUser = {
+        username: 'testuser',
+        email: 'test@email.com',
+        password: 'password',
+        bio: 'User bio content',
+        role: 'author'
+    };
+
+    let blogToUpdate;
+    let cookies;
+
+    beforeEach(async () => {
+        await createTestUser(testUser);
+        const user = await User.findOne({ email: testUser.email });
+
+        blogToUpdate = await Blog.create({
+            title: 'Original Title',
+            subtitle: 'Original Subtitle',
+            content: 'Original content for the blog post.',
+            author: user._id,
+            slug: 'original-title',
+            status: 'published'
+        });
+
+        const loginResponse = await request(app)
+            .post('/login')
+            .send({ email: testUser.email, password: testUser.password });
+        cookies = loginResponse.headers['set-cookie'];
+    });
+
+    test('should update a blog post successfully', async () => {
+        const updates = {
+            title: 'Updated Title',
+            subtitle: 'Updated Subtitle'
+        };
+
+        const response = await request(app)
+            .put(`/blogs/update/${blogToUpdate.slug}`)
+            .set('Cookie', cookies)
+            .send(updates)
+            .expect(200);
+
+        expect(response.body.message).toBe('Blog Updated');
+        expect(response.body.blog.title).toBe(updates.title);
+
+        const updatedBlog = await Blog.findById(blogToUpdate._id);
+        expect(updatedBlog.title).toBe(updates.title);
+        expect(updatedBlog.subtitle).toBe(updates.subtitle);
+    });
+});
+
+describe('DELETE /blogs/:slug', () => {
+    const testUser = {
+        username: 'testuser',
+        email: 'test@email.com',
+        password: 'password',
+        bio: 'User bio content',
+        role: 'author'
+    };
+
+    let blogToDelete;
+    let cookies;
+
+    beforeEach(async () => {
+        await createTestUser(testUser);
+        const user = await User.findOne({ email: testUser.email });
+
+        blogToDelete = await Blog.create({
+            title: 'To Be Deleted',
+            content: 'This blog will be deleted.',
+            author: user._id,
+            slug: 'to-be-deleted',
+            status: 'published'
+        });
+
+        const loginResponse = await request(app)
+            .post('/login')
+            .send({ email: testUser.email, password: testUser.password });
+        cookies = loginResponse.headers['set-cookie'];
+    });
+
+    test('should delete a blog post successfully', async () => {
+        const response = await request(app)
+            .delete(`/blogs/${blogToDelete.slug}`)
+            .set('Cookie', cookies)
+            .expect(200);
+
+        expect(response.body.message).toBe('Blog deleted successfully');
+        expect(response.body.deletedSlug).toBe(blogToDelete.slug);
+
+        const deletedBlog = await Blog.findById(blogToDelete._id);
+        expect(deletedBlog).toBeNull();
+    });
+});
+
+describe('GET /:username/blogs/:slug', () => {
+    const testUser = {
+        username: 'testuser',
+        email: 'test@email.com',
+        password: 'password',
+        bio: 'User bio content',
+        role: 'author'
+    };
+
+    let publicBlog;
+
+    beforeEach(async () => {
+        await createTestUser(testUser);
+        const user = await User.findOne({ email: testUser.email });
+
+        publicBlog = await Blog.create({
+            title: 'Public Blog Post',
+            content: 'This is a public blog post.',
+            author: user._id,
+            slug: 'public-blog-post',
+            status: 'published'
+        });
+    });
+
+    test('should return a blog post page for a published blog', async () => {
+        const response = await request(app)
+            .get(`/${testUser.username}/blogs/${publicBlog.slug}`)
+            .expect(200);
+
+        expect(response.text).toContain(publicBlog.title);
+    });
+
+    test('should return 404 for a non-existent blog', async () => {
+        await request(app)
+            .get(`/${testUser.username}/blogs/non-existent-slug`)
+            .expect(404);
+    });
+});

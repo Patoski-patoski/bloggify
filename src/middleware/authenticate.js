@@ -34,8 +34,8 @@ export const authenticateToken = async (req, res, next) => {
             return res.status(HTTP_STATUS.UNAUTHORIZED).redirect('/login');
         }
 
-        req.user = decoded;
-        res.locals.user = decoded;
+        req.user = user;
+        res.locals.user = user.toJSON(); // Use toJSON to respect schema transforms
         return next();
     } catch (error) {
         console.log('Access token verification failed:', error.message);

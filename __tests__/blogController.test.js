@@ -35,7 +35,7 @@ describe('POST /blogs', () => {
         subtitle: 'Test Subtitle',
         content: 'This is a test blog post with enough content to pass validation',
         status: 'published',
-        image: 'test-image.jpg'
+        image: 'http://example.com/test-image.jpg'
     };
 
     test('should create a new blog post with authentication', async () => {
@@ -59,7 +59,7 @@ describe('POST /blogs', () => {
             .expect(201);
 
         expect(blogResponse.body).toMatchObject({
-            message: 'Blog post created',
+            message: 'Blog created successfully',
             blog: expect.objectContaining({
                 title: mockBlogData.title,
                 subtitle: mockBlogData.subtitle

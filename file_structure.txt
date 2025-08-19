@@ -1,0 +1,12 @@
+ feat: Improve draft management and fix deletion issues
+ 
+    - Refactor blog creation and update flows to enhance draft management and
+      resolve issues with draft deletion and publishing.
+    
+    - Introduce dedicated API endpoint and controller for draft creation (`POST /blogs/draft`).
+    - Streamline `postBlog` controller to focus solely on publishing new blogs.
+    - Update frontend `saveDraft` logic to utilize the new draft creation endpoint.
+    - Ensure `publishBlog` correctly updates blog status to 'published' via `PUT /blogs/update/:slug`.
+    - Implement client-side JavaScript for draft and published blog deletion on the profile page,
+      including confirmation modal and API integration.
+    - Increase MongoDB memory server timeout in test setup to prevent intermittent test failures.

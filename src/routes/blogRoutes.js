@@ -14,6 +14,7 @@ import {
     updateBlog,
     createDraft
 } from '../controllers/blogControllers.js';
+import { validateBlog } from '../middleware/validators.js';
 
 
 // GET     /home                 -> Render homepage
@@ -25,7 +26,7 @@ import {
 // DELETE  /blogs/:slug          -> Delete a blog by slug
 
 // GET     /api/blogs            -> Get all blogs (API)
-// GET     /api/blogs/:slug      -> Get a blog by slug (API)
+// GET     /api/gpi/blogs/:slug      -> Get a blog by slug (API)
 // GET     /api/blogs/search     -> Search blogs by query
 // GET     /api/blogs/author/:username -> Get blogs by author
 
@@ -40,7 +41,7 @@ blogRouter.get(['/home', '/'], (_req, res) => res.render('index'));
 blogRouter.get('/blogs', getBlogs);
 
 // POST a blog
-blogRouter.post('/blogs/publish', authenticateToken, authorizeRole('author'), postBlog);
+blogRouter.post('/blogs/publish', authenticateToken, authorizeRole('author'), validateBlog, postBlog);
 
 // POST a draft
 blogRouter.post('/blogs/draft', authenticateToken, authorizeRole('author'), createDraft);

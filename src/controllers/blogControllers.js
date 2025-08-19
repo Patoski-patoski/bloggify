@@ -1,175 +1,90 @@
-// controllers/blogControllers.js 
-
 import Blog from '../models/Blog.js';
 import User from '../models/User.js';
 import { HTTP_STATUS } from '../../config/constant.js';
-import generateUniqueSlug from '../utils/slugify.js';
 import asyncHandler from 'express-async-handler';
-import { getBlogsByAuthor, findUserByUsername } from '../services/blogServices.js';
+
+import * as blogService from '../services/blogServices.js';
 
 // POST a new blog (publish)
-export const postBlog = asyncHandler(async (req, res) => {
-    const { title, subtitle, content, image } = req.body;
-
-    const user = await User.findOne({ id: req.user.userId });
-    if (!user) {
-        return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: "Authentication failed. Please check your credentials." });
-    }
-
+export const postBlog = asyncHandler(async (req, res, next) => {
     try {
-        const slug = await generateUniqueSlug(title);
-
-        const newBlog = await Blog.create({
-            title,
-            subtitle,
-            content,
-            status: 'published', // Always published
-            slug,
-            image,
-            author: user._id,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        });
-
-        const author = await User.findOne({ _id: newBlog.author });
-        const username = author.username;
-
-        return res.status(HTTP_STATUS.CREATED).json({
-            message: "Blog post created",
-            blog: newBlog,
-            username
-        });
-
+        const newBlog = await blogService.createBlogPostService(req.body, req.user);
+        res.status(201).json({ message: 'Blog created successfully', blog: newBlog });
     } catch (error) {
-        console.error(error);
-        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-            message: error.message
+        next(error);
+    }
+});
+
+// PUT (update) a blog
+export const updateBlog = asyncHandler(async (req, res, next) => {
+    try {
+        const updatedBlog = await blogService.updateBlogService(req.params.slug, req.user._id, req.body);
+        res.status(HTTP_STATUS.OK).json({
+            message: "Blog Updated",
+            blog: updatedBlog
         });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Delete blog
+export const deleteBlog = asyncHandler(async (req, res, next) => {
+    try {
+        const result = await blogService.deleteBlogService(req.params.slug, req.user._id);
+        res.status(HTTP_STATUS.OK).json({
+            message: 'Blog deleted successfully',
+            ...result
+        });
+    } catch (error) {
+        next(error);
     }
 });
 
 // POST a new draft
-export const createDraft = asyncHandler(async (req, res) => {
-    const { title, subtitle, content, image } = req.body;
-
-    const user = await User.findOne({ id: req.user.userId });
-    if (!user) {
-        return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: "Authentication failed. Please check your credentials." });
-    }
-
+export const createDraft = asyncHandler(async (req, res, next) => {
     try {
-        const slug = await generateUniqueSlug(title);
-
-        const newDraft = await Blog.create({
-            title,
-            subtitle,
-            content,
-            status: 'draft', // Always draft
-            slug,
-            image,
-            author: user._id,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        });
-
-        return res.status(HTTP_STATUS.CREATED).json({
+        const draftData = { ...req.body, status: 'draft' };
+        const newDraft = await blogService.createBlogPostService(draftData, req.user);
+        res.status(HTTP_STATUS.CREATED).json({
             message: "Draft created",
             blog: newDraft
         });
-
     } catch (error) {
-        console.error(error);
-        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-            message: error.message
-        });
+        next(error);
     }
 });
 
-
 // Open a draft for editing
-export const draftBlog = asyncHandler(async (req, res) => {
-    const { slug } = req.params;
+export const draftBlog = asyncHandler(async (req, res, next) => {
+    try {
+        const { slug } = req.params;
+        const draft = await blogService.draftBlogService(slug, req.user);
 
-    // First try to find a draft version
-    let draft = await Blog.findOne({ slug, status: 'draft' });
+        if (!draft) {
+            return res.status(HTTP_STATUS.NOT_FOUND).render('error', {
+                statusCode: HTTP_STATUS.NOT_FOUND,
+                message: 'Draft not found',
+                href: '/profile',
+            });
+        }
 
-    // If no draft found, try to find a published version
-    if (!draft) {
-        draft = await Blog.findOne({ slug, status: "published" });
-    }
-
-    if (!draft) return res.status(HTTP_STATUS.NOT_FOUND).render('error', {
-        statusCode: HTTP_STATUS.NOT_FOUND,
-        message: 'Draft not found',
-        href: '/profile',
-    });
-
-    const author = await User.findOne({ _id: draft.author });
-    const user = await User.findOne({ id: req.user.userId });
-
-    if (author.id === user.id) {
-        return res.render('edit_blog', {
+        res.render('edit_blog', {
             title: draft.title,
             subtitle: draft.subtitle,
             image: draft.image,
             content: draft.content,
-            slug: draft.slug, // Pass the slug to the template
+            slug: draft.slug,
             unsplashAccessKey: process.env.UNSPLASH_ACCESS_KEY
         });
+    } catch (error) {
+        next(error);
     }
-
-    return res.status(HTTP_STATUS.UNAUTHORIZED).render('error', {
-        statusCode: HTTP_STATUS.UNAUTHORIZED,
-        message: 'Unauthorized user',
-        href: '/blogs'
-    });
 });
-
-// PUT (update) a blog
-export const updateBlog = asyncHandler(async (req, res) => {
-    const { slug } = req.params;
-    const updates = req.body;
-
-    const user = await User.findOne({ id: req.user.userId });
-    if (!user) return res.status(HTTP_STATUS.NOT_FOUND).json({
-        message: "User not found"
-    });
-
-    // Find the blog first to check if it exists
-    const existingBlog = await Blog.findOne({ slug, author: user._id });
-    if (!existingBlog) {
-        return res.status(HTTP_STATUS.NOT_FOUND).json({
-            message: "Blog not found or not authorized"
-        });
-    }
-
-    // If title is being updated, we might need a new slug
-    if (updates.title && updates.title !== existingBlog.title) {
-        // Keep the existing slug if possible, but generate a new one if necessary
-        updates.slug = await generateUniqueSlug(updates.title, slug);
-    }
-
-    const blog = await Blog.findOneAndUpdate(
-        { slug, author: user._id },
-        { ...updates, updatedAt: new Date() },
-        { new: true, runValidators: true }
-    );
-
-    const author = await User.findOne({ _id: blog.author });
-    const username = author.username;
-
-    return res.status(HTTP_STATUS.OK).json({
-        message: "Blog Updated",
-        blog,
-        username
-    });
-});
-
 
 export const getPostsBySlug = asyncHandler(async (req, res) => {
     const { slug } = req.params;
 
-    // Find the blog with the current slug
     const blog = await Blog.findOne({ slug, status: 'published' });
     if (!blog) {
         return res.status(HTTP_STATUS.NOT_FOUND).render('unauthorized', {
@@ -177,7 +92,6 @@ export const getPostsBySlug = asyncHandler(async (req, res) => {
         });
     }
 
-    // Find the author of the blog
     const author = await User.findOne({ _id: blog.author });
     if (!author) {
         return res.status(HTTP_STATUS.NOT_FOUND).render('unauthorized', {
@@ -185,17 +99,14 @@ export const getPostsBySlug = asyncHandler(async (req, res) => {
         });
     }
 
-    // Fetch more blogs from the same author, excluding the current blog
     const moreBlogsFromAuthor = await Blog.find({
         author: author._id,
         status: "published",
-        _id: { $ne: blog._id }, // Exclude the current blog by ID
-    })
-        .limit(6);
+        _id: { $ne: blog._id },
+    }).limit(6);
 
     const username = author.username;
 
-    // Render the view with the blog and more blogs
     return res.render('new_blog', { blog, username, moreBlogsFromAuthor });
 });
 
@@ -206,7 +117,7 @@ export const getAllPublishedBlogs = asyncHandler(async (_req, res) => {
 
     if (!publishedBlogs) {
         return res.status(HTTP_STATUS.NOT_FOUND).json({
-            message: " No blogs Posts",
+            message: "No blogs Posts",
             blogs: []
         });
     }
@@ -221,15 +132,13 @@ export const getPostsByAuthor = asyncHandler(async (req, res) => {
     const { username } = req.params;
     const page = parseInt(req.query.page) || 1;
 
-    const user = await findUserByUsername(username);
+    const user = await blogService.findUserByUsername(username);
     if (!user) {
-        // Check if it's an API request or browser request
         if (req.headers.accept && req.headers.accept.includes('application/json')) {
             return res.status(HTTP_STATUS.NOT_FOUND).json({
                 message: 'Author not found',
             });
         } else {
-            // Render error page for browser requests
             return res.status(HTTP_STATUS.NOT_FOUND).render('error', {
                 message: `Author "${username}" not found`,
                 href: '/blogs'
@@ -237,7 +146,7 @@ export const getPostsByAuthor = asyncHandler(async (req, res) => {
         }
     }
 
-    const { blogs, totalPages, currentPage, totalBlogs } = await getBlogsByAuthor(user._id, page);
+    const { blogs, totalPages, currentPage, totalBlogs } = await blogService.getBlogsByAuthor(user._id, page);
     return res.status(HTTP_STATUS.OK).render('author', {
         user,
         blogs,
@@ -247,50 +156,13 @@ export const getPostsByAuthor = asyncHandler(async (req, res) => {
     });
 });
 
-// Delete blog
-export const deleteBlog = asyncHandler(async (req, res) => {
+export const getBlogs = asyncHandler(async (req, res) => {
     try {
-        const { slug } = req.params;
-        const userId = req.user.userId;
-
-        console.log('Attempting to delete blog with slug:', slug);
-        console.log('User ID:', userId);
-
-        // Find the blog by slug and ensure it belongs to the authenticated user
-        const blog = await Blog.findOne({ slug, author: userId });
-
-        if (!blog) {
-            return res.status(HTTP_STATUS.NOT_FOUND).json({
-                message: 'Blog not found or you do not have permission to delete it'
-            });
-        }
-
-        // Delete the blog
-        await Blog.findByIdAndDelete(blog._id);
-
-        res.status(HTTP_STATUS.OK).json({
-            message: 'Blog deleted successfully',
-            deletedSlug: slug
-        });
-
-    } catch (error) {
-        console.error('Error in deleteBlog:', error);
-        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-            message: 'An error occurred while deleting the blog',
-            error: error.message
-        });
-    }
-});
-
-export const getBlogs = async (req, res) => {
-    try {
-        // Get featured posts (One can determine featured posts based on views, likes, etc.)
         const featuredPosts = await Blog.find({ status: 'published' })
             .sort({ 'meta.views': -1 })
             .limit(5)
             .populate('author', 'username');
 
-        // Get regular posts with pagination
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 9;
 
@@ -317,9 +189,9 @@ export const getBlogs = async (req, res) => {
             error: error.message,
         });
     }
-};
+});
 
-export const searchBlogs = async (req, res) => {
+export const searchBlogs = asyncHandler(async (req, res) => {
     try {
         const { q, sort, page = 1, limit = 9 } = req.query;
 
@@ -358,4 +230,4 @@ export const searchBlogs = async (req, res) => {
             error: error.message
         });
     }
-};
+});

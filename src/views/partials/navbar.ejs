@@ -12,10 +12,13 @@
                         <a style="color: #9198a1" class="nav-link" href="/create">Create blog</a>
                     </li>
                     <li class="nav-item">
+                        <a style="color: #9198a1" class="nav-link" href="/blogs">Read Blogs</a>
+                    </li>
+                    <li class="nav-item">
                         <a style="color: #9198a1" class="nav-link" href="/profile">Profile</a>
                     </li>
                     <li class="nav-item">
-                        <a style="color: #9198a1" class="nav-link" href="/logout">Logout <%= locals.user.name %></a>
+                        <a style="color: #9198a1" class="nav-link" href="/logout">Logout <%= locals.user.username %></a>
                     </li>
                 <% } else { %>
                     <li class="nav-item">
@@ -23,9 +26,6 @@
                     </li>
                     <li class="nav-item">
                         <a style="color: #9198a1" class="nav-link" href="/login">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a style="color: #9198a1" class="nav-link" href="/blogs">Read Blogs</a>
                     </li>
                 <% } %>
             </ul>

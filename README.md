@@ -1,104 +1,194 @@
 # Bloggify
 
-Bloggify is a full-stack blogging application that allows users to create, manage, and share blog posts. Built with a focus on simplicity and usability, Bloggify employs a modern tech stack to provide a seamless experience for both developers and users.
+A modern, full-stack blog application built with Node.js, Express, and MongoDB, designed for seamless content creation and sharing.
+
+## Table of Contents
+
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Installation](#installation)
+- [Environment Variables](#environment-variables)
+- [Running the Application](#running-the-application)
+- [Usage](#usage)
+- [API Documentation](#api-documentation)
+- [Testing](#testing)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
 
 ## Features
 
-- **User Authentication**: Secure login and registration using JSON Web Tokens (JWT).
-- **CRUD Operations**: Create, Read, Update, and Delete blog posts with ease.
-- **Slug-based URLS**: Access blog posts via user-friendly slugs.
-- **User Management**: Users can manage their blog posts.
+-   **User Authentication:** Secure signup, login, and logout with JWTs and refresh tokens.
+-   **Role-Based Access Control:** Differentiate between 'reader' and 'author' roles.
+-   **Blog Management:**
+    -   Create, read, update, and delete blog posts.
+    -   Support for drafts and publishing.
+    -   Rich text editing for blog content (TinyMCE).
+    -   Image uploads and Unsplash integration for featured images.
+-   **Dynamic Content:**
+    -   Unique slug generation for blog posts.
+    -   Categorization with tags.
+    -   Author profiles with published blogs.
+-   **Robust Backend:**
+    -   Centralized error handling for consistent API and web responses.
+    -   Input validation using Joi for data integrity.
+    -   Service layer architecture for clear separation of concerns.
+-   **Security:** Implemented Helmet.js, CORS, and rate limiting.
 
-## Technology Stack
+## Technologies Used
 
-- **Frontend**: HTML, CSS, Bootstrap, JavaScript
-- **Backend**: Node.js with Express.js
-- **Database**: Mongodb, accessed through Mongoose
-- **Authentication**: JSON Web Tokens (JWT)
+-   **Backend:**
+    -   Node.js
+    -   Express.js (Web Framework)
+    -   MongoDB (Database)
+    -   Mongoose (ODM)
+    -   bcrypt (Password Hashing)
+    -   jsonwebtoken (JWT Authentication)
+    -   express-async-handler (Error Handling for Async Routes)
+    -   Joi (Input Validation)
+    -   Helmet.js (Security Headers)
+    -   express-rate-limit (Rate Limiting)
+    -   cookie-parser (Cookie Handling)
+    -   slugify (Slug Generation)
+-   **Frontend:**
+    -   EJS (Templating Engine)
+    -   Bootstrap 5 (CSS Framework)
+    -   TinyMCE (Rich Text Editor)
+    -   Custom CSS and JavaScript
+-   **Testing:**
+    -   Jest (Testing Framework)
+    -   Supertest (HTTP assertions)
+    -   mongodb-memory-server (In-memory MongoDB for tests)
 
 ## Installation
 
-To get started with Bloggify, follow these steps:
+### Prerequisites
 
-1. **Clone the repository**:
+-   Node.js (v18 or higher recommended)
+-   npm (comes with Node.js)
+-   MongoDB (local installation or cloud service like MongoDB Atlas)
 
-   ```bash
-   git clone https://github.com/Patoski-patoski/bloggify.git
-   cd bloggify
-   ```
+### Steps
 
-2. **Install dependencies**:
-
-   ```bash
-   npm install
-   ```
-
-3. **Set up your environment**:
-   - Create a `.env` file in the root directory and add your MongoDB connection string and JWT secret:
-
+1.  **Clone the repository:**
     ```bash
-     MONGODB_URI=your_mongodb_uri
-     JWT_SECRET=your_jwt_secret
-     REFRESH_JWT_SECRET=your_jwt_refresh_secret
-     ```
+    git clone https://github.com/patoski-patoski/bloggify.git
+    ```
+2.  **Navigate to the project directory:**
+    ```bash
+    cd bloggify
+    ```
+3.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-4. **Run the application**:
+## Environment Variables
 
-   ```bash
-   npm start
-   ```
+Create a `.env` file in the root directory of your project and add the following environment variables:
 
-   The application should now be running on `http://localhost:3000`.
+```
+PORT=3000
+MONGODB_URI_ATLAS=your_mongodb_connection_string_or_local_uri (e.g., mongodb://localhost:27017/bloggify_db)
+JWT_SECRET=a_very_strong_secret_for_jwt
+REFRESH_JWT_SECRET=another_very_strong_secret_for_refresh_jwt
+UNSPLASH_ACCESS_KEY=your_unsplash_api_access_key (optional, for image selection)
+NODE_ENV=development # or production
+```
 
-## API Endpoints
+## Running the Application
 
-### Authentication
+### Development Mode
 
-- **POST /register**: Register a new user
-- **POST /login**: Login an existing user
+To start the server in development mode (with nodemon for auto-restarts):
 
-### Blog Posts
+```bash
+npm run dev
+```
 
-- **GET /api/posts**: Retrieve all blog posts
-- **GET /api/posts/:slug**: Retrieve a single blog post by slug
-- **POST /api/posts**: Create a new blog post
-- **PUT /api/posts/:slug**: Update an existing blog post
-- **DELETE /api/posts/:slug**: Delete a blog post
+### Production Mode
 
-## License
+To start the server in production mode:
 
-This project does not specify a license, so the default copyright applies. Feel free to contribute and modify as needed.
+```bash
+npm start
+```
+
+Access the application in your browser at `http://localhost:3000` (or your specified PORT).
+
+## Usage
+
+1.  **Register:** Create a new user account.
+2.  **Login:** Access your dashboard.
+3.  **Create Blog:** Start writing new posts, save them as drafts, or publish them.
+4.  **Manage Blogs:** Edit or delete your existing posts from your profile.
+5.  **Explore:** Browse other authors' blogs.
+
+## API Documentation
+
+The API endpoints are documented using Swagger/OpenAPI.
+You can view the interactive API documentation by running the application and navigating to `/api-docs` in your browser (e.g., `http://localhost:3000/api-docs`).
+
+The OpenAPI specification is located at `swagger.yaml`.
+
+## Testing
+
+To run the test suite:
+
+```bash
+npm test
+```
+
+This will execute all tests using Jest and Supertest, ensuring the backend API endpoints function as expected.
+
+## Project Structure
+
+```
+.
+├── config/                 # Application configuration
+├── __tests__/              # Unit and integration tests
+├── src/
+│   ├── controllers/        # Request handlers (e.g., auth, blog)
+│   ├── database/           # Database connection setup
+│   ├── middleware/         # Express middleware (e.g., auth, error handling, validation)
+│   ├── models/             # Mongoose schemas and models
+│   ├── public/             # Static assets (CSS, JS, images)
+│   │   ├── javascript/     # Frontend JavaScript
+│   │   ├── stylesheets/    # Frontend CSS
+│   │   └── img/            # Images
+│   ├── routes/             # API routes and web routes
+│   ├── services/           # Business logic and data manipulation
+│   ├── utils/              # Utility functions (e.g., slugify)
+│   └── views/              # EJS templates
+├── .env.example            # Example environment variables
+├── app.js                  # Main Express application file
+├── server.js               # Server startup file
+├── package.json            # Project dependencies and scripts
+├── README.md               # Project README
+└── ...
+```
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
+We welcome contributions! Please follow these steps:
 
-## Contact
+1.  Fork the repository.
+2.  Create a new branch (`git checkout -b feature/your-feature-name`).
+3.  Make your changes.
+4.  Ensure tests pass (`npm test`).
+5.  Commit your changes (`git commit -m 'feat: Add new feature'`).
+6.  Push to the branch (`git push origin feature/your-feature-name`).
+7.  Open a pull request.
 
-For any inquiries, please contact [patrickpeters911@gmail.com](mailto:patrickpeters911@gmail.com).
+Please ensure your code adheres to the existing style and conventions.
 
-## File structure
+## License
 
-```bash
-your-project/
-├── public/                      # All static assets go here
-│   ├── stylesheets/             # CSS files
-│   │   └── profile.css          # Your profile CSS
-│   ├── javascript/              # JavaScript files 
-│   │   └── profile.js           # Your profile JavaScript
-│   ├── img/                     # Images
-│   │   ├── user.jpg             # Default user image
-│   │   ├── blog-1.jpg           # Blog thumbnail
-│   │   └── blog-draft.jpg       # Draft thumbnail
-│   └── other-static-assets/     # Other assets
-├── views/                       # Your EJS templates
-│   ├── partials/                # Reusable template parts
-│   │   └── navbar.ejs           # Navigation bar partial
-│   └── profile.ejs              # Your profile view
-├── src/                         # Application source code
-│   ├── controllers/             # Controller functions
-│   ├── middleware/              # Middlewares like authentication
-│   └── models/                  # Database models
-├── app.js or index.js           # Main application file
-└── package.json                 # Project dependencies
-```
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgements
+
+-   Inspired by various Node.js and Express.js best practices.
+-   Thanks to the creators of the libraries and tools used in this project.
+-   HTML Codex for the base template design.

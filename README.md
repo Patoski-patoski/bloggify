@@ -144,7 +144,7 @@ This will execute all tests using Jest and Supertest, ensuring the backend API e
 
 ## Project Structure
 
-```
+```bash
 .
 ├── config/                 # Application configuration
 ├── __tests__/              # Unit and integration tests
